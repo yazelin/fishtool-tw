@@ -175,7 +175,9 @@ const heroImage = gallery[0] ?? null;
     overflow: hidden;
     position: relative;
   }
-  .hero-img img { width: 100%; height: 100%; object-fit: contain; padding: var(--space-4); }
+  .hero-img img { width: 100%; height: 100%; object-fit: contain; padding: var(--space-4); transition: filter var(--duration-slow) var(--ease-out); }
+  [data-theme='dark'] .hero-img img { filter: brightness(0.92) saturate(0.9); }
+  [data-theme='dark'] .hero-img { background: radial-gradient(circle at center, var(--ink-700) 0%, var(--ink-800) 100%); }
   .empty-img { color: var(--fg-muted); }
   .gallery-ribbon { position: absolute; top: var(--space-3); left: var(--space-3); }
 
@@ -196,6 +198,7 @@ const heroImage = gallery[0] ?? null;
     transition: border-color var(--duration-fast) var(--ease-out);
   }
   .thumb-btn img { width: 100%; height: 100%; object-fit: contain; }
+  [data-theme='dark'] .thumb-btn img { filter: brightness(0.92) saturate(0.9); }
   .thumb-btn:hover { border-color: var(--fg-secondary); }
   .thumb-btn.is-active { border-color: var(--brass-500); }
 

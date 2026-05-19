@@ -139,7 +139,16 @@ const faqs = [
   }
   .info-images img {
     width: 100%; height: auto; display: block;
-    background: #fff;
+    background: var(--cream-050);
+  }
+  /* banner 是淺底的 infographic，dark mode 維持淺底但加上 wrapper 邊框 */
+  [data-theme='dark'] .info-images figure {
+    background: var(--cream-050);
+    border-color: var(--ink-700);
+  }
+  [data-theme='dark'] .info-images figcaption {
+    background: var(--bg-soft);
+    color: var(--fg-primary);
   }
   .info-images figcaption {
     padding: var(--space-3);
