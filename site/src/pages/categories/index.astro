@@ -1,9 +1,8 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { getCollection } from 'astro:content';
-import { loadMenuList } from '../../lib/data';
+import { loadMenuList, url } from '../../lib/data';
 
-const base = import.meta.env.BASE_URL;
 const cats = (await getCollection('categories')).map((c) => c.data)
   .sort((a, b) => (b.total_count ?? 0) - (a.total_count ?? 0));
 const catBySid = new Map(cats.map((c) => [c.sid, c]));
@@ -29,11 +28,11 @@ const groups = menus
     <section class="by-menu">
       {groups.map(({ menu, subs }) => (
         <div class="menu-block">
-          <h2><a href={`${base}menus/${menu.menu_id}`}>{menu.name}</a></h2>
+          <h2><a href={url(`menus/${menu.menu_id}`)}>{menu.name}</a></h2>
           <ul>
             {subs.map((c) => (
               <li>
-                <a href={`${base}categories/${c.sid}`}>{c.name}</a>
+                <a href={url(`categories/${c.sid}`)}>{c.name}</a>
                 <span class="count">{c.total_count}</span>
               </li>
             ))}

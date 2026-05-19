@@ -1,5 +1,5 @@
 ---
-const base = import.meta.env.BASE_URL;
+import { url } from '../lib/data';
 ---
 
 <footer class="site-footer">
@@ -14,9 +14,9 @@ const base = import.meta.env.BASE_URL;
       <ul>
         <li>客服信箱：<a href="mailto:service@fishtool.tw">service@fishtool.tw</a></li>
         <li>線上聊聊：10:00 – 21:00</li>
-        <li><a href={`${base}order`}>訂單查詢</a></li>
-        <li><a href={`${base}faq`}>常見問題</a></li>
-        <li><a href={`${base}inquiry`}>客服詢問</a></li>
+        <li><a href={url('order')}>訂單查詢</a></li>
+        <li><a href={url('faq')}>常見問題</a></li>
+        <li><a href={url('inquiry')}>客服詢問</a></li>
       </ul>
     </section>
 
@@ -37,8 +37,8 @@ const base = import.meta.env.BASE_URL;
   <div class="footer-bottom container">
     <small>© {new Date().getFullYear()} 紅海釣具 RED SEA TACKLE — 重建版 site</small>
     <small>
-      <a href={`${base}privacy`}>隱私權</a> ·
-      <a href={`${base}terms`}>服務條款</a>
+      <a href={url('privacy')}>隱私權</a> ·
+      <a href={url('terms')}>服務條款</a>
     </small>
   </div>
 </footer>

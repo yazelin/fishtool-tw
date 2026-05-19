@@ -2,6 +2,19 @@
 // 提供從商品名稱抓品牌、價格格式化等共用函式。
 import { getCollection, type CollectionEntry } from 'astro:content';
 
+/**
+ * 產出含 base path 的網址。確保 base 與 path 之間恰好一個斜線，
+ * 避免 import.meta.env.BASE_URL 有無尾斜線造成連結錯誤。
+ *
+ * @param path 「不含 base」的路徑，例如 "categories/643"、"products/216276" 或 ""
+ */
+export function url(path: string = ''): string {
+  const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
+  const p = path.replace(/^\/+/, '');
+  if (!p) return base + '/';
+  return `${base}/${p}`;
+}
+
 export type Product = CollectionEntry<'products'>['data'];
 export type Category = CollectionEntry<'categories'>['data'];
 export type Menu = CollectionEntry<'menus'>['data'];

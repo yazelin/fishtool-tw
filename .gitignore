@@ -38,3 +38,4 @@ Thumbs.db
 fishtool_raw/
 fishtool_progress.jsonl
 fishtool_failed_pids.txt
+/release-tmp/

@@ -2,7 +2,7 @@
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
-import { loadCategoryMap } from '../../lib/data';
+import { loadCategoryMap, url } from '../../lib/data';
 
 export async function getStaticPaths() {
   const menus = await getCollection('menus');
@@ -13,7 +13,6 @@ export async function getStaticPaths() {
 }
 
 const { menu } = Astro.props;
-const base = import.meta.env.BASE_URL;
 const categories = await loadCategoryMap();
 
 const subs = menu.subcategories
@@ -32,7 +31,7 @@ const subs = menu.subcategories
     <ul class="subcat-grid">
       {subs.map((s) => (
         <li>
-          <a href={`${base}categories/${s.sid}`} class="subcat-tile">
+          <a href={url(`categories/${s.sid}`)} class="subcat-tile">
             <h3>{s.name}</h3>
             <span class="count">{s.total_count ?? 0} 件商品</span>
           </a>
