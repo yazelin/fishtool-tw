@@ -1,0 +1,213 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import { loadProductMap, extractBrand, pickThumb, formatPrice } from '../../lib/data';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('products');
+  return entries.map((e) => ({
+    params: { pid: String(e.data.pid) },
+    props: { product: e.data },
+  }));
+}
+
+const { product } = Astro.props;
+const all = await loadProductMap();
+
+const brand = extractBrand(product.name);
+const hasSale =
+  product.price !== null &&
+  product.sale_price !== null &&
+  (product.sale_price as number) < (product.price as number);
+
+const crumbs = product.breadcrumb.map((label) => ({ label }));
+const related = product.related_pids
+  .map((p) => all.get(p))
+  .filter((p): p is NonNullable<typeof p> => !!p)
+  .slice(0, 6);
+
+const heroImage = product.detail_images[0] ?? product.thumb_images[0] ?? null;
+const gallery = [
+  ...(product.detail_images ?? []),
+  ...(product.thumb_images ?? []),
+].filter(Boolean);
+---
+
+<Base title={product.name ?? `商品 ${product.pid}`}>
+  <div class="container">
+    <Breadcrumb items={crumbs.length > 0 ? crumbs : [{ label: product.name ?? '商品' }]} />
+
+    <div class="detail">
+      <section class="gallery">
+        <div class="hero-img">
+          {heroImage ? (
+            <img src={heroImage} alt={product.name ?? ''} />
+          ) : (
+            <div class="empty-img" aria-hidden="true">無圖</div>
+          )}
+        </div>
+        {gallery.length > 1 && (
+          <div class="thumbs">
+            {gallery.slice(0, 6).map((src) => (
+              <img src={src} alt="" loading="lazy" />
+            ))}
+          </div>
+        )}
+      </section>
+
+      <aside class="info">
+        <div class="meta">
+          {brand && <span class="badge badge-brand">{brand}</span>}
+          {product.sku && <span class="sku">編號 {product.sku}</span>}
+        </div>
+        <h1>{product.name}</h1>
+
+        <div class="price-block">
+          {hasSale ? (
+            <>
+              <span class="sale">{formatPrice(product.sale_price)}</span>
+              <span class="orig">原價 {formatPrice(product.price)}</span>
+              <span class="badge badge-sale">特價</span>
+            </>
+          ) : (
+            <span class="sale">{formatPrice(product.sale_price ?? product.price)}</span>
+          )}
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" disabled>加入購物車</button>
+          <button class="btn btn-secondary" disabled>收藏</button>
+        </div>
+
+        <ul class="trust">
+          <li>滿千免運（依原站政策）</li>
+          <li>客服 10:00–21:00 在線</li>
+          <li>實體門市可取貨</li>
+        </ul>
+      </aside>
+    </div>
+
+    {product.description && (
+      <section class="description">
+        <h2>商品說明</h2>
+        <p>{product.description}</p>
+      </section>
+    )}
+
+    {related.length > 0 && (
+      <section class="related">
+        <h2>相關商品</h2>
+        <div class="grid-cards">
+          {related.map((p) => (
+            <ProductCard
+              pid={p.pid}
+              sku={p.sku}
+              name={p.name}
+              price={p.price}
+              salePrice={p.sale_price}
+              thumb={pickThumb(p)}
+              brand={extractBrand(p.name)}
+            />
+          ))}
+        </div>
+      </section>
+    )}
+  </div>
+</Base>
+
+<style>
+  .detail {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+    margin-block: var(--space-5) var(--space-7);
+  }
+  @media (min-width: 900px) { .detail { grid-template-columns: 6fr 4fr; } }
+
+  .hero-img {
+    aspect-ratio: 1;
+    background: var(--bg-elevated);
+    border-radius: var(--radius-lg);
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+  .hero-img img { width: 100%; height: 100%; object-fit: contain; }
+  .empty-img { color: var(--fg-muted); }
+
+  .thumbs {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+  }
+  .thumbs img {
+    aspect-ratio: 1;
+    object-fit: contain;
+    background: var(--bg-elevated);
+    border-radius: var(--radius-sm);
+  }
+
+  .info { display: flex; flex-direction: column; gap: var(--space-4); }
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--fg-secondary);
+    font-size: var(--text-sm);
+  }
+  .sku { font-family: var(--font-mono); }
+
+  .info h1 {
+    font-size: var(--text-2xl);
+    line-height: 1.3;
+  }
+
+  .price-block {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3);
+    padding-block: var(--space-3);
+    border-block: 1px solid var(--border-subtle);
+  }
+  .price-block .sale {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--accent-ember);
+  }
+  .price-block .orig {
+    color: var(--fg-muted);
+    text-decoration: line-through;
+    font-size: var(--text-sm);
+  }
+
+  .actions { display: flex; gap: var(--space-3); flex-wrap: wrap; }
+  .actions .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .trust {
+    list-style: none;
+    padding: var(--space-4);
+    margin: 0;
+    background: var(--bg-elevated);
+    border-radius: var(--radius-md);
+    display: grid;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--fg-secondary);
+  }
+
+  .description, .related {
+    margin-block: var(--space-7);
+  }
+  .description h2, .related h2 {
+    font-size: var(--text-xl);
+    margin-bottom: var(--space-4);
+  }
+  .description p {
+    max-width: var(--article-max);
+    white-space: pre-wrap;
+    line-height: 1.8;
+  }
+</style>

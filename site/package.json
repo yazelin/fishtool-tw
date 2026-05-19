@@ -1,0 +1,22 @@
+{
+  "name": "fishtool-tw-site",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "description": "紅海釣具店 — 重建版（Astro 靜態站）",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "astro": "^5.0.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.0",
+    "typescript": "^5.6.0"
+  }
+}

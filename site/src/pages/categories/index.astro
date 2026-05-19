@@ -1,0 +1,77 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import { loadMenuList } from '../../lib/data';
+
+const base = import.meta.env.BASE_URL;
+const cats = (await getCollection('categories')).map((c) => c.data)
+  .sort((a, b) => (b.total_count ?? 0) - (a.total_count ?? 0));
+const catBySid = new Map(cats.map((c) => [c.sid, c]));
+const menus = await loadMenuList();
+
+const groups = menus
+  .map((m) => ({
+    menu: m,
+    subs: m.subcategories
+      .map((s) => catBySid.get(s.sid))
+      .filter((c): c is NonNullable<typeof c> => !!c),
+  }))
+  .filter((g) => g.subs.length > 0);
+---
+
+<Base title="全部商品分類">
+  <div class="container">
+    <header class="head">
+      <h1>全部分類</h1>
+      <p>共 {cats.length} 個分類、{cats.reduce((s, c) => s + (c.total_count ?? 0), 0).toLocaleString('zh-Hant')} 件商品</p>
+    </header>
+
+    <section class="by-menu">
+      {groups.map(({ menu, subs }) => (
+        <div class="menu-block">
+          <h2><a href={`${base}menus/${menu.menu_id}`}>{menu.name}</a></h2>
+          <ul>
+            {subs.map((c) => (
+              <li>
+                <a href={`${base}categories/${c.sid}`}>{c.name}</a>
+                <span class="count">{c.total_count}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </section>
+  </div>
+</Base>
+
+<style>
+  .head { margin-block: var(--space-5) var(--space-6); }
+  .head p { color: var(--fg-secondary); margin-top: var(--space-2); }
+
+  .by-menu { display: grid; gap: var(--space-7); }
+  .menu-block h2 {
+    font-size: var(--text-xl);
+    margin-bottom: var(--space-3);
+  }
+  .menu-block h2 a { color: var(--fg-primary); }
+  .menu-block h2 a:hover { color: var(--brand-tide); }
+  .menu-block ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: var(--space-2) var(--space-4);
+  }
+  .menu-block li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    background: var(--bg-elevated);
+  }
+  .menu-block li:hover { background: var(--bg-elevated-hover); }
+  .menu-block li a { color: var(--fg-primary); }
+  .count { color: var(--fg-secondary); font-size: var(--text-xs); }
+</style>

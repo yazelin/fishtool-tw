@@ -1,0 +1,48 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="訂單查詢">
+  <div class="container">
+    <header class="head">
+      <h1>訂單查詢</h1>
+      <p>輸入訂單編號與訂購時填寫的 Email 或手機末四碼。</p>
+    </header>
+
+    <form class="form" onsubmit="return false">
+      <label>
+        訂單編號
+        <input type="text" name="order_id" required />
+      </label>
+      <label>
+        Email 或手機末四碼
+        <input type="text" name="contact" required />
+      </label>
+      <button type="submit" class="btn btn-primary" disabled>查詢（後端尚未實作）</button>
+    </form>
+  </div>
+</Base>
+
+<style>
+  .head { margin-block: var(--space-5) var(--space-6); }
+  .head p { color: var(--fg-secondary); margin-top: var(--space-2); }
+
+  .form {
+    display: grid;
+    gap: var(--space-4);
+    max-width: 480px;
+    background: var(--bg-elevated);
+    padding: var(--space-6);
+    border-radius: var(--radius-md);
+  }
+  .form label { display: grid; gap: var(--space-2); font-size: var(--text-sm); color: var(--fg-secondary); }
+  .form input {
+    padding: var(--space-3);
+    border-radius: var(--radius-sm);
+    background: var(--bg-base);
+    border: 1px solid var(--border-subtle);
+    color: var(--fg-primary);
+  }
+  .form input:focus { border-color: var(--brand-tide); }
+  .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+</style>

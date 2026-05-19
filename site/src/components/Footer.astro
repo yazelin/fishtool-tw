@@ -1,0 +1,88 @@
+---
+const base = import.meta.env.BASE_URL;
+---
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <section>
+      <h3>關於紅海釣具</h3>
+      <p>磯釣、灘釣、船釣、釣蝦、路亞——多元釣具一站精選。實體店面與線上同步。</p>
+    </section>
+
+    <section>
+      <h3>客服資訊</h3>
+      <ul>
+        <li>客服信箱：<a href="mailto:service@fishtool.tw">service@fishtool.tw</a></li>
+        <li>線上聊聊：10:00 – 21:00</li>
+        <li><a href={`${base}order`}>訂單查詢</a></li>
+        <li><a href={`${base}faq`}>常見問題</a></li>
+        <li><a href={`${base}inquiry`}>客服詢問</a></li>
+      </ul>
+    </section>
+
+    <section>
+      <h3>社群</h3>
+      <ul>
+        <li>
+          <a
+            href="https://www.facebook.com/groups/809912915726639/"
+            target="_blank"
+            rel="noopener"
+          >Facebook 社團</a>
+        </li>
+      </ul>
+    </section>
+  </div>
+
+  <div class="footer-bottom container">
+    <small>© {new Date().getFullYear()} 紅海釣具 RED SEA TACKLE — 重建版 site</small>
+    <small>
+      <a href={`${base}privacy`}>隱私權</a> ·
+      <a href={`${base}terms`}>服務條款</a>
+    </small>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: var(--space-9);
+    background: var(--ink-900);
+    color: var(--ink-300);
+    border-top: 1px solid var(--border-subtle);
+    padding: var(--space-7) 0 var(--space-5);
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+  @media (min-width: 768px) {
+    .footer-grid { grid-template-columns: 1.5fr 1fr 1fr; }
+  }
+  .site-footer h3 {
+    font-size: var(--text-base);
+    color: var(--ink-100);
+    margin-bottom: var(--space-3);
+  }
+  .site-footer ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: var(--space-2);
+  }
+  .site-footer a { color: var(--ink-300); }
+  .site-footer a:hover { color: var(--ink-100); }
+
+  .footer-bottom {
+    margin-top: var(--space-6);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--ink-700);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    font-size: var(--text-xs);
+    color: var(--fg-muted);
+  }
+</style>

@@ -1,0 +1,40 @@
+# Node
+node_modules/
+.npm/
+.pnp.*
+.yarn/
+
+# Astro
+site/dist/
+site/.astro/
+.astro/
+
+# Build outputs
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Crawler intermediates (大量 HTML 不入庫)
+/raw-html/
+/tmp/
+
+# 商品圖（總量 ~18GB，透過 GitHub Release attachments 提供下載；本地 images/ 不入庫）
+/images/
+
+# 暫存爬蟲產物
+fishtool_raw/
+fishtool_progress.jsonl
+fishtool_failed_pids.txt

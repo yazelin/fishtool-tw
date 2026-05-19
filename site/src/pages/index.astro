@@ -1,0 +1,179 @@
+---
+import Base from '../layouts/Base.astro';
+import ProductCard from '../components/ProductCard.astro';
+import { loadProductMap, loadMenuList, extractBrand, pickThumb } from '../lib/data';
+
+const base = import.meta.env.BASE_URL;
+const products = await loadProductMap();
+const menus = await loadMenuList();
+
+const all = Array.from(products.values());
+const onSale = all
+  .filter((p) => p.price !== null && p.sale_price !== null && p.sale_price! < p.price!)
+  .slice(0, 12);
+const newArrivals = all.slice(-8).reverse();
+---
+
+<Base title="紅海釣具店">
+  <section class="hero">
+    <div class="container hero-inner">
+      <div class="hero-copy">
+        <p class="hero-eyebrow">精選釣具 · 多元品項</p>
+        <h1 class="hero-title">
+          磯礁、灘岸、深海、釣蝦<br />
+          一站備齊
+        </h1>
+        <p class="hero-sub">
+          11 大類、{products.size.toLocaleString('zh-Hant')}+ 件商品。SHIMANO、DAIWA、上興、HEXING、pokee … 老店熟客的選擇。
+        </p>
+        <div class="cluster">
+          <a href={`${base}categories`} class="btn btn-primary">逛全部商品</a>
+          <a href={`${base}menus/27`} class="btn btn-secondary">釣竿專區</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="container section">
+    <header class="section-head">
+      <h2>11 大類入口</h2>
+      <p>從適合你的釣法或裝備類型開始</p>
+    </header>
+    <ul class="menu-grid">
+      {menus.map((m) => (
+        <li>
+          <a href={`${base}menus/${m.menu_id}`} class="menu-tile">
+            <span class="menu-icon" aria-hidden="true">●</span>
+            <span class="menu-name">{m.name}</span>
+            <span class="menu-count">{m.subcategories.length} 子分類</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  {onSale.length > 0 && (
+    <section class="container section">
+      <header class="section-head">
+        <h2>特價精選</h2>
+        <a href={`${base}sale`} class="see-all">看全部 →</a>
+      </header>
+      <div class="grid-cards">
+        {onSale.map((p) => (
+          <ProductCard
+            pid={p.pid}
+            sku={p.sku}
+            name={p.name}
+            price={p.price}
+            salePrice={p.sale_price}
+            thumb={pickThumb(p)}
+            brand={extractBrand(p.name)}
+          />
+        ))}
+      </div>
+    </section>
+  )}
+
+  {newArrivals.length > 0 && (
+    <section class="container section">
+      <header class="section-head">
+        <h2>新品上架</h2>
+      </header>
+      <div class="grid-cards">
+        {newArrivals.map((p) => (
+          <ProductCard
+            pid={p.pid}
+            sku={p.sku}
+            name={p.name}
+            price={p.price}
+            salePrice={p.sale_price}
+            thumb={pickThumb(p)}
+            brand={extractBrand(p.name)}
+          />
+        ))}
+      </div>
+    </section>
+  )}
+</Base>
+
+<style>
+  .hero {
+    position: relative;
+    background:
+      radial-gradient(1200px 600px at 80% 20%, rgba(14, 124, 134, 0.18), transparent 60%),
+      linear-gradient(180deg, var(--ink-900) 0%, var(--ink-800) 100%);
+    padding-block: var(--space-9);
+    overflow: hidden;
+  }
+  .hero-eyebrow {
+    color: var(--brand-tide);
+    font-size: var(--text-sm);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: var(--space-3);
+  }
+  .hero-title {
+    font-size: var(--text-display);
+    line-height: 1.15;
+    color: var(--fg-primary);
+  }
+  .hero-sub {
+    margin-block: var(--space-5);
+    color: var(--fg-secondary);
+    max-width: 56ch;
+  }
+
+  .section {
+    padding-block: var(--space-7);
+  }
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: var(--space-5);
+    gap: var(--space-4);
+    flex-wrap: wrap;
+  }
+  .section-head p { color: var(--fg-secondary); margin: 0; }
+  .see-all { color: var(--fg-secondary); font-size: var(--text-sm); }
+  .see-all:hover { color: var(--brand-tide); }
+
+  .menu-grid {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+  }
+  @media (min-width: 480px) { .menu-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (min-width: 768px) { .menu-grid { grid-template-columns: repeat(4, 1fr); } }
+  @media (min-width: 1024px) { .menu-grid { grid-template-columns: repeat(6, 1fr); } }
+
+  .menu-tile {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    background: var(--bg-elevated);
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+    color: var(--fg-primary);
+    border: 1px solid transparent;
+    transition: border-color var(--duration-base) var(--ease-out),
+                transform var(--duration-base) var(--ease-out);
+  }
+  .menu-tile:hover {
+    border-color: var(--brand-tide);
+    transform: translateY(-2px);
+    color: var(--fg-primary);
+  }
+  .menu-icon {
+    color: var(--brand-tide);
+    font-size: var(--text-xl);
+  }
+  .menu-name { font-weight: 600; }
+  .menu-count {
+    font-size: var(--text-xs);
+    color: var(--fg-secondary);
+  }
+</style>

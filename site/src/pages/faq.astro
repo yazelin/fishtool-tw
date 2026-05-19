@@ -1,0 +1,65 @@
+---
+import Base from '../layouts/Base.astro';
+
+// 等爬蟲 functional_pages.faq 抓回後，把實際 FAQ 內容填到這裡
+const faqs = [
+  { q: '怎麼下單？', a: '從商品頁加入購物車，依結帳流程填寫資料即可。後續會擴充支付/物流整合。' },
+  { q: '滿千免運是怎麼算的？', a: '同筆訂單商品總額（不含運費）滿 NT$1,000 即享免運，限本島地區。' },
+  { q: '可以到實體門市自取嗎？', a: '可以，下單時備註自取，並等待客服聯絡。' },
+  { q: '商品有保固嗎？', a: '原廠商品依品牌保固政策；副廠或特價品依商品頁說明。' },
+  { q: '如何查詢訂單？', a: '請到「訂單查詢」頁面輸入訂單編號與聯絡資料。' },
+];
+---
+
+<Base title="常見問題 FAQ">
+  <div class="container">
+    <header class="head">
+      <h1>常見問題</h1>
+      <p>沒看到答案？歡迎到「客服詢問」頁留言。</p>
+    </header>
+
+    <ul class="faq">
+      {faqs.map((item) => (
+        <li>
+          <details>
+            <summary>{item.q}</summary>
+            <p>{item.a}</p>
+          </details>
+        </li>
+      ))}
+    </ul>
+  </div>
+</Base>
+
+<style>
+  .head { margin-block: var(--space-5) var(--space-6); }
+  .head p { color: var(--fg-secondary); margin-top: var(--space-2); }
+
+  .faq { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--space-3); max-width: var(--article-max); }
+  .faq li {
+    background: var(--bg-elevated);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+  details summary {
+    padding: var(--space-4);
+    cursor: pointer;
+    font-weight: 600;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  details summary::after {
+    content: '+';
+    font-size: var(--text-xl);
+    color: var(--fg-secondary);
+    transition: transform var(--duration-base) var(--ease-out);
+  }
+  details[open] summary::after { content: '−'; }
+  details p {
+    padding: 0 var(--space-4) var(--space-4);
+    color: var(--fg-secondary);
+    line-height: 1.8;
+  }
+</style>
