@@ -1,123 +1,77 @@
 ---
-// 紅海釣具 v0.3 品牌識別：黃銅金 + 暖炭墨 + 襯線 italic 字標
+// 紅海釣具 v0.4 品牌識別：用原 logo 像素級重染後的 PNG（保留原本筆觸體形）
+// light 版：brass + 暖墨黑
+// dark 版：brass + cream
 // 用法：
-//   <Brand />                       — 預設 md，full（mark + 字標）
+//   <Brand />              — 預設 md
 //   <Brand size="lg" />
-//   <Brand variant="mark" />        — 只要 mark
-//   <Brand tone="dark" />           — 反白版（暗底用）
+//   <Brand href="/" />     — wrap 成連結
+import { url } from '../lib/data';
+
 interface Props {
   size?: 'sm' | 'md' | 'lg' | 'xl';
-  variant?: 'full' | 'mark' | 'wordmark';
-  tone?: 'light' | 'dark';
   href?: string | false;
+  tone?: 'auto' | 'light' | 'dark';   // auto = 跟 [data-theme] 切；light/dark = 強制
 }
 
-const {
-  size = 'md',
-  variant = 'full',
-  tone = 'light',
-  href = false,
-} = Astro.props;
+const { size = 'md', href = false, tone = 'auto' } = Astro.props;
 
-const markPx = {
-  sm: 22,
-  md: 28,
-  lg: 38,
-  xl: 54,
+const heightPx = {
+  sm: 28,
+  md: 36,
+  lg: 48,
+  xl: 64,
 }[size];
 
 const Wrapper = href ? 'a' : 'span';
 ---
 
-<Wrapper class:list={["brand", `size-${size}`, `variant-${variant}`, `tone-${tone}`]} {...(href ? { href } : {})}>
-  {variant !== 'wordmark' && (
-    <span class="mark" aria-hidden="true">
-      <svg viewBox="0 0 48 48" width={markPx} height={markPx} xmlns="http://www.w3.org/2000/svg">
-        {/* 圓底（薄）*/}
-        <circle class="mark-bg" cx="24" cy="24" r="22" fill="none" stroke-width="1.2" />
-        {/* 魚鉤 */}
-        <path class="mark-hook" d="M24 12 V28 a7 7 0 0 1 -14 0 L10 27.5"
-              fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-        <circle class="mark-eye" cx="24" cy="11.4" r="1.9" />
-      </svg>
-    </span>
-  )}
-  {variant !== 'mark' && (
-    <span class="wordmark">
-      <span class="en">FishTool<span class="dot">.</span>tw</span>
-      <span class="cn">紅海釣具</span>
-    </span>
-  )}
+<Wrapper class:list={["brand", `size-${size}`, `tone-${tone}`]} {...(href ? { href, 'aria-label': '紅海釣具 FishTool.tw 首頁' } : {})}>
+  <img
+    src={url('logo-brass.png')}
+    alt="紅海釣具 FishTool.tw"
+    width={heightPx * 5.435}
+    height={heightPx}
+    class="logo logo-light"
+  />
+  <img
+    src={url('logo-brass-dark.png')}
+    alt=""
+    aria-hidden="true"
+    width={heightPx * 5.435}
+    height={heightPx}
+    class="logo logo-dark"
+  />
 </Wrapper>
 
 <style>
   .brand {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-3);
     color: inherit;
     text-decoration: none;
-    line-height: 1;
+    line-height: 0;
+  }
+  .logo {
+    display: block;
+    height: auto;
+    transition: opacity var(--duration-fast) var(--ease-out);
   }
 
-  .mark { display: inline-grid; flex-shrink: 0; }
-  .mark svg { display: block; }
-  /* 用 fg-primary 讓 mark 自動跟主題走 */
-  .mark-bg { stroke: var(--brass-500); }
-  .mark-hook { stroke: var(--fg-primary); }
-  .mark-eye { fill: var(--brass-700); }
+  /* auto：跟 [data-theme] 切（預設） */
+  .tone-auto .logo-light { display: block; }
+  .tone-auto .logo-dark  { display: none; }
+  :global([data-theme='dark']) .tone-auto .logo-light { display: none; }
+  :global([data-theme='dark']) .tone-auto .logo-dark  { display: block; }
 
-  /* dark theme：圓圈跟眼點改用較亮的金，hook 用 cream（fg-primary 已是 cream，不必再寫）*/
-  :global([data-theme='dark']) .mark-bg { stroke: var(--brass-300); }
-  :global([data-theme='dark']) .mark-eye { fill: var(--brass-500); }
+  /* light：強制使用 light 版（淺底） */
+  .tone-light .logo-light { display: block; }
+  .tone-light .logo-dark  { display: none; }
 
-  /* tone="dark" 顯式（在淺底頁面要用反白版）：強制使用 dark 變體 */
-  .tone-dark .mark-bg { stroke: var(--brass-300); }
-  .tone-dark .mark-hook { stroke: var(--cream-050); }
-  .tone-dark .mark-eye { fill: var(--brass-500); }
+  /* dark：強制使用 dark 版（暗底，例如 footer 永遠暗） */
+  .tone-dark .logo-light { display: none; }
+  .tone-dark .logo-dark  { display: block; }
 
-  /* 字標 — 英文襯線斜體（主）+ 中文襯線（副） */
-  .wordmark {
-    display: inline-flex;
-    flex-direction: column;
-    line-height: 1.05;
-  }
-
-  .en {
-    font-family: var(--font-serif);
-    font-style: italic;
-    font-weight: 500;
-    color: var(--fg-primary);
-    letter-spacing: -0.005em;
-  }
-  .en .dot { color: var(--brass-500); }
-  :global([data-theme='dark']) .en .dot { color: var(--brass-300); }
-
-  /* 顯式反白版（淺底時偶爾要強制反白）*/
-  .tone-dark .en { color: var(--cream-050); }
-  .tone-dark .en .dot { color: var(--brass-300); }
-
-  .cn {
-    font-family: var(--font-serif-cn);
-    font-weight: 500;
-    color: var(--fg-secondary);
-    margin-top: 4px;
-    letter-spacing: 0.12em;
-  }
-  .tone-dark .cn { color: var(--ink-300); }
-
-  /* 尺寸 */
-  .size-sm .en { font-size: 16px; }
-  .size-sm .cn { font-size: 10px; letter-spacing: 0.18em; margin-top: 2px; }
-
-  .size-md .en { font-size: 22px; }
-  .size-md .cn { font-size: 11px; letter-spacing: 0.2em; }
-
-  .size-lg .en { font-size: 28px; }
-  .size-lg .cn { font-size: 13px; }
-
-  .size-xl .en { font-size: 42px; }
-  .size-xl .cn { font-size: 16px; margin-top: 8px; }
-
-  a.brand:hover { color: inherit; opacity: 0.85; }
+  /* hover 時整體微透明 */
+  a.brand:hover .logo { opacity: 0.85; }
 </style>

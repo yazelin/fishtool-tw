@@ -1,13 +1,13 @@
 ---
 import { url } from '../lib/data';
+import Brand from './Brand.astro';
 ---
 
 <footer class="site-footer">
   <div class="container footer-grid">
     <section class="brand-block">
       <div class="footer-brand">
-        <span class="brand-cn">紅海釣具</span>
-        <span class="brand-en">FishTool.tw</span>
+        <Brand size="lg" tone="dark" href={url()} />
       </div>
       <p class="brand-desc">磯釣、灘釣、船釣、釣蝦、路亞——多元釣具一站精選。<br />中壢實體門市與線上同步出貨。</p>
       <div class="social-row">
@@ -105,30 +105,9 @@ import { url } from '../lib/data';
   }
 
   .footer-brand {
-    display: flex;
-    flex-direction: column;
-    line-height: 1;
-    color: var(--ink-100);
-    margin-bottom: var(--space-3);
+    margin-bottom: var(--space-4);
   }
-  .footer-brand .brand-cn {
-    font-size: var(--text-base);
-    font-family: var(--font-serif-cn);
-    font-weight: 500;
-    letter-spacing: 0.18em;
-    order: 2;
-    margin-top: 4px;
-  }
-  .footer-brand .brand-en {
-    font-size: 22px;
-    font-family: var(--font-serif);
-    font-style: italic;
-    font-weight: 500;
-    letter-spacing: -0.005em;
-    color: var(--cream-050);
-    order: 1;
-  }
-  .brand-desc { font-size: var(--text-sm); line-height: 1.85; max-width: 38ch; }
+  .brand-desc { font-size: var(--text-sm); line-height: 1.85; max-width: 38ch; margin-top: var(--space-3); }
 
   .social-row {
     display: flex;
