@@ -56,6 +56,8 @@ const brands = ['DAIWA', 'SHIMANO', 'OWNER', 'gamakatsu', 'HARiMitsu', 'pokee', 
 <Base title="紅海釣具店">
   {/* === HERO === */}
   <section class="hero">
+    <img class="hero-bg" src={url('hero/angler-twilight.png')} alt="" aria-hidden="true" fetchpriority="high" />
+    <div class="hero-overlay" aria-hidden="true"></div>
     <div class="container hero-inner">
       <div class="hero-copy">
         <span class="hero-eyebrow">RED SEA TACKLE · 精選釣具一站備齊</span>
@@ -64,23 +66,14 @@ const brands = ['DAIWA', 'SHIMANO', 'OWNER', 'gamakatsu', 'HARiMitsu', 'pokee', 
           <span class="hero-accent">釣出你的精彩</span>
         </h1>
         <p class="hero-sub">
-          磯礁、灘岸、深海、釣蝦——{products.size.toLocaleString('zh-Hant')}+ 件 SKU、超過 30 個品牌長期穩定供貨。<br />
-          老店熟客的選擇。
+          磯礁、灘岸、深海、釣蝦——{products.size.toLocaleString('zh-Hant')}+ 件 SKU、<br />
+          超過 30 個品牌長期穩定供貨。老店熟客的選擇。
         </p>
         <div class="hero-cta">
           <a href={url('categories')} class="btn btn-primary btn-lg">逛全部商品</a>
           <a href={url('menus/27')} class="btn btn-ghost-on-dark btn-lg">釣竿專區 →</a>
         </div>
       </div>
-      {heroCollageThumbs.length >= 4 && (
-        <div class="hero-collage" aria-hidden="true">
-          {heroCollageThumbs.slice(0, 4).map((src, i) => (
-            <figure class={`tile tile-${i}`}>
-              <img src={src} alt="" loading="eager" />
-            </figure>
-          ))}
-        </div>
-      )}
     </div>
   </section>
 
@@ -218,17 +211,42 @@ const brands = ['DAIWA', 'SHIMANO', 'OWNER', 'gamakatsu', 'HARiMitsu', 'pokee', 
 </Base>
 
 <style>
-  /* === HERO（永遠深色） === */
+  /* === HERO（永遠深色，AI 海邊照當底） === */
   .hero {
     position: relative;
-    background:
-      radial-gradient(900px 500px at 80% 30%, color-mix(in srgb, var(--brand-tide) 28%, transparent), transparent 60%),
-      radial-gradient(700px 400px at 10% 80%, color-mix(in srgb, var(--ink-700) 80%, transparent), transparent 65%),
-      linear-gradient(165deg, var(--ink-900) 0%, var(--ink-800) 100%);
+    background: var(--ink-900);
     color: #fff;
     overflow: hidden;
   }
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 40%;
+    display: block;
+    pointer-events: none;
+    z-index: 0;
+  }
+  /* 左側深色漸層蒙版：保證 hero copy 對比 */
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg,
+        rgba(11, 27, 43, 0.92) 0%,
+        rgba(11, 27, 43, 0.78) 28%,
+        rgba(11, 27, 43, 0.45) 55%,
+        rgba(11, 27, 43, 0.15) 85%,
+        rgba(11, 27, 43, 0) 100%),
+      linear-gradient(180deg, rgba(11,27,43,0.2) 0%, transparent 30%, transparent 70%, rgba(11,27,43,0.55) 100%);
+    z-index: 1;
+    pointer-events: none;
+  }
   .hero-inner {
+    position: relative;
+    z-index: 2;
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--space-6);
@@ -237,7 +255,8 @@ const brands = ['DAIWA', 'SHIMANO', 'OWNER', 'gamakatsu', 'HARiMitsu', 'pokee', 
     min-height: 480px;
   }
   @media (min-width: 900px) {
-    .hero-inner { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); padding-block: var(--space-9); min-height: 560px; }
+    .hero-inner { grid-template-columns: minmax(0, 1fr); padding-block: var(--space-9); min-height: 620px; }
+    .hero-copy { max-width: 580px; }
   }
 
   .hero-eyebrow {
@@ -287,36 +306,7 @@ const brands = ['DAIWA', 'SHIMANO', 'OWNER', 'gamakatsu', 'HARiMitsu', 'pokee', 
     color: #fff;
   }
 
-  /* Hero 商品照拼貼 */
-  .hero-collage {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    gap: var(--space-3);
-    width: 100%;
-    max-width: 480px;
-    margin-left: auto;
-    aspect-ratio: 1;
-  }
-  .hero-collage .tile {
-    margin: 0;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    display: grid;
-    place-items: center;
-    transition: transform var(--duration-base) var(--ease-out);
-  }
-  .hero-collage .tile img {
-    width: 88%; height: 88%; object-fit: contain;
-    filter: drop-shadow(0 8px 16px rgba(0,0,0,0.35));
-  }
-  .hero-collage .tile-0 { transform: translateY(-8px); }
-  .hero-collage .tile-3 { transform: translateY(8px); }
-  @media (max-width: 899px) {
-    .hero-collage { display: none; }
-  }
+  /* （hero-collage 已移除，hero 改用全幅實景照）*/
 
   /* === Sections === */
   .section { padding-block: var(--space-8); }
