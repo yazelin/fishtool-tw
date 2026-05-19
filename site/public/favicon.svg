@@ -1,5 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="12" fill="#0B1B2B"/>
-  <path d="M14 38c4-10 14-16 24-14 5 1 9 5 12 10-7 4-15 6-22 4-5-1-9-1-14 0z" fill="#0E7C86"/>
-  <circle cx="44" cy="30" r="2.2" fill="#E15D2F"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-label="紅海釣具">
+  <title>紅海釣具 RED SEA TACKLE</title>
+  <rect width="64" height="64" rx="14" fill="#0B1B2B"/>
+  <!-- 魚鉤 -->
+  <path d="M32 14 L32 36 a10 10 0 0 1 -20 0 L12 34" fill="none" stroke="#E15D2F" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 鉤眼 -->
+  <circle cx="32" cy="13" r="2.6" fill="#E15D2F"/>
+  <!-- 海浪 -->
+  <path d="M10 50 Q19 46 28 50 T46 50 T56 50" fill="none" stroke="#0E7C86" stroke-width="3" stroke-linecap="round" stroke-opacity="0.95"/>
 </svg>

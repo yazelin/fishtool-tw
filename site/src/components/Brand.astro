@@ -1,0 +1,110 @@
+---
+// 紅海釣具品牌識別：魚鉤 + 海浪幾何 mark + 中英字標
+// 用法：
+//   <Brand />                       — 預設 md，full（mark + 字標）
+//   <Brand size="lg" />
+//   <Brand variant="mark" />        — 只要 mark
+//   <Brand tone="dark" />           — 反白版（暗底用）
+interface Props {
+  size?: 'sm' | 'md' | 'lg' | 'xl';
+  variant?: 'full' | 'mark' | 'wordmark';
+  tone?: 'light' | 'dark';
+  href?: string | false;
+}
+
+const {
+  size = 'md',
+  variant = 'full',
+  tone = 'light',
+  href = false,
+} = Astro.props;
+
+const markPx = {
+  sm: 24,
+  md: 32,
+  lg: 40,
+  xl: 56,
+}[size];
+
+const Wrapper = href ? 'a' : 'span';
+---
+
+<Wrapper class:list={["brand", `size-${size}`, `variant-${variant}`, `tone-${tone}`]} {...(href ? { href } : {})}>
+  {variant !== 'wordmark' && (
+    <span class="mark" aria-hidden="true">
+      <svg viewBox="0 0 64 64" width={markPx} height={markPx} xmlns="http://www.w3.org/2000/svg">
+        <rect class="mark-bg" width="64" height="64" rx="14" />
+        <path class="mark-hook" d="M32 14 L32 36 a10 10 0 0 1 -20 0 L12 34" fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+        <circle class="mark-eye" cx="32" cy="13" r="2.6" />
+        <path class="mark-wave" d="M10 50 Q19 46 28 50 T46 50 T56 50" fill="none" stroke-width="3" stroke-linecap="round" />
+      </svg>
+    </span>
+  )}
+  {variant !== 'mark' && (
+    <span class="wordmark">
+      <span class="cn">紅海釣具</span>
+      <span class="en">RED&nbsp;SEA&nbsp;TACKLE</span>
+    </span>
+  )}
+</Wrapper>
+
+<style>
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    color: inherit;
+    text-decoration: none;
+    line-height: 1;
+  }
+
+  .mark { display: inline-grid; flex-shrink: 0; }
+  .mark svg { display: block; }
+  .mark-bg { fill: var(--ink-900); }
+  .mark-hook { stroke: var(--accent-ember); }
+  .mark-eye { fill: var(--accent-ember); }
+  .mark-wave { stroke: var(--brand-tide); }
+
+  /* 反白版（深底頁面） */
+  .tone-dark .mark-bg { fill: #fff; fill-opacity: 0.08; }
+  .tone-dark .mark-hook,
+  .tone-dark .mark-eye { stroke: var(--accent-ember); fill: var(--accent-ember); }
+  .tone-dark .mark-wave { stroke: var(--brand-tide-soft); stroke-opacity: 0.85; }
+
+  .wordmark {
+    display: inline-flex;
+    flex-direction: column;
+    line-height: 1;
+    color: var(--ink-900);
+    font-weight: 700;
+  }
+  .tone-dark .wordmark { color: #fff; }
+
+  .cn {
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  .en {
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    color: var(--ink-500);
+    margin-top: 4px;
+  }
+  .tone-dark .en { color: rgba(255, 255, 255, 0.55); }
+
+  /* 尺寸 */
+  .size-sm .cn { font-size: 14px; }
+  .size-sm .en { font-size: 8px; letter-spacing: 0.18em; margin-top: 2px; }
+
+  .size-md .cn { font-size: 18px; }
+  .size-md .en { font-size: 9.5px; }
+
+  .size-lg .cn { font-size: 22px; }
+  .size-lg .en { font-size: 10.5px; }
+
+  .size-xl .cn { font-size: 32px; }
+  .size-xl .en { font-size: 12px; letter-spacing: 0.28em; margin-top: 6px; }
+
+  /* hover 時整體不變色（保留識別） */
+  a.brand:hover { color: inherit; opacity: 0.9; }
+</style>

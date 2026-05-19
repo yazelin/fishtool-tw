@@ -86,9 +86,11 @@ const groups = menus
     gap: var(--space-3);
     padding: var(--space-3) var(--space-4);
     border-radius: var(--radius-sm);
-    background: var(--bg-elevated);
+    background: var(--bg-soft);
+    border: 1px solid var(--border-soft);
     color: var(--fg-primary);
-    transition: background var(--duration-fast) var(--ease-out);
+    transition: background var(--duration-fast) var(--ease-out),
+                border-color var(--duration-fast) var(--ease-out);
   }
   .menu-block li a:hover { background: var(--bg-elevated-hover); }
   .menu-block .name { font-size: var(--text-sm); }

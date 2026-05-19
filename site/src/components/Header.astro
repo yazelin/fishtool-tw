@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import { url } from '../lib/data';
+import Brand from './Brand.astro';
 
 let menus: any[] = [];
 try {
@@ -20,10 +21,8 @@ try {
       </svg>
     </button>
 
-    <a href={url()} class="brand" aria-label="紅海釣具 首頁">
-      <span class="brand-cn">紅海釣具</span>
-      <span class="brand-en">RED&nbsp;SEA&nbsp;TACKLE</span>
-    </a>
+    <Brand href={url()} size="md" />
+
 
     <form class="search" role="search" action={url('search')} method="get">
       <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -167,25 +166,7 @@ try {
   }
   .hamburger:hover { background: var(--bg-elevated-hover); }
 
-  .brand {
-    display: flex;
-    flex-direction: column;
-    line-height: 1;
-    color: var(--fg-primary);
-    font-weight: 700;
-    text-decoration: none;
-    flex-shrink: 0;
-  }
-  .brand-cn {
-    font-size: var(--text-lg);
-    letter-spacing: 0.02em;
-  }
-  .brand-en {
-    font-size: 10px;
-    letter-spacing: 0.22em;
-    color: var(--fg-muted);
-    margin-top: 3px;
-  }
+  /* Brand 元件已自帶樣式；Header 不再覆寫 brand 外觀 */
 
   .search {
     flex: 1;
@@ -206,7 +187,7 @@ try {
     padding: 0 var(--space-4) 0 calc(var(--space-4) + 22px);
     border-radius: var(--radius-pill);
     border: 1px solid var(--border-subtle);
-    background: var(--bg-elevated);
+    background: var(--bg-soft);
     color: var(--fg-primary);
     font-size: var(--text-sm);
     transition: border-color var(--duration-fast) var(--ease-out);

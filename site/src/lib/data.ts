@@ -32,8 +32,38 @@ export function formatPrice(n: number | null | undefined): string {
   return `$${n.toLocaleString('zh-Hant')}`;
 }
 
+// 把資料裡 /images188/X 路徑改為走我們自己的 HTTPS proxy（避免 mixed content）。
+// e.g. "/images188/2000162-1.jpg" → "/api/img/2000162-1.jpg"
+const IMG_PATH_RE = /^\/images188\//;
+export function proxyImg(src: string | null | undefined): string | null {
+  if (!src) return null;
+  if (IMG_PATH_RE.test(src)) {
+    const base = (import.meta.env.BASE_URL ?? '').replace(/\/+$/, '');
+    return `${base}/api/img/${src.replace(IMG_PATH_RE, '')}`;
+  }
+  return src;
+}
+
 export function pickThumb(product: Product): string | null {
-  return product.thumb_images?.[0] ?? null;
+  return proxyImg(product.thumb_images?.[0]);
+}
+
+export function pickGallery(product: Product): string[] {
+  const all = [
+    ...(product.detail_images ?? []),
+    ...(product.thumb_images ?? []),
+  ].filter(Boolean) as string[];
+  // 去重 + 轉 proxy
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const src of all) {
+    const proxied = proxyImg(src);
+    if (proxied && !seen.has(proxied)) {
+      seen.add(proxied);
+      out.push(proxied);
+    }
+  }
+  return out;
 }
 
 export async function loadProductMap(): Promise<Map<number, Product>> {

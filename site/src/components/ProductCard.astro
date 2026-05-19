@@ -50,20 +50,24 @@ const formatPrice = (n?: number | null) =>
     display: flex;
     flex-direction: column;
     background: var(--bg-elevated);
-    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
     overflow: hidden;
     transition: transform var(--duration-base) var(--ease-out),
-                box-shadow var(--duration-base) var(--ease-out);
+                box-shadow var(--duration-base) var(--ease-out),
+                border-color var(--duration-base) var(--ease-out);
     color: inherit;
   }
   .card:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
+    border-color: var(--gray-300);
   }
+  [data-theme='dark'] .card:hover { border-color: var(--ink-500); }
   .thumb {
     aspect-ratio: 1;
     position: relative;
-    background: var(--ink-800);
+    background: var(--bg-soft);
     display: grid;
     place-items: center;
     overflow: hidden;

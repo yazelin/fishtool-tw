@@ -66,8 +66,9 @@
 | `--status-info` | `#3B82F6` | 資訊 |
 
 ### 2.5 雙模式（Light / Dark）
-- **預設 = Dark**（戶外裝備類網站常用，照片在深底更顯料）
-- **使用者可切換 Light**：用 `prefers-color-scheme` + 手動 toggle
+- **預設 = Light**（依 mockup 與電商實務：白底攝影感、商品為主角）
+- Hero、Footer、Brand wall 等局部用深色（`--ink-900`）作為氣勢區塊
+- 使用者可切 Dark：用 `prefers-color-scheme` + 手動 toggle
 - 切換策略：用 CSS 變數對應到 `[data-theme="dark"]` 與 `[data-theme="light"]`
 
 ---
@@ -381,9 +382,9 @@
 
 ## 11. 暗色模式 / 亮色模式
 
-- **預設 Dark**：戶外裝備類氛圍、商品圖在深底更立體
-- **Light 模式**：日間或不偏好深色的使用者
-- 切換放在 Header 右側齒輪/月亮 icon
+- **預設 Light**：白底卡片、攝影為主、商品為主角（依 §14 mockup）
+- 局部深色塊：Hero overlay、品牌牆、Footer
+- **可切 Dark**：戶外氛圍偏好者；放在 Header 月亮 icon
 - 兩種模式都要過對比度測試
 
 ---
@@ -408,10 +409,11 @@
 
 ---
 
-## 14. 參考視覺稿（Reference Mockups）
+## 14. 參考視覺稿（Reference Mockups）— **主規範**
 
-> 兩張外部產生的設計示意圖，僅供未來設計與實作時對齊整體調性、版型節奏與元件密度。
-> **不是規範本身**：當與本文 §1–§12 的 token / 規則衝突時，**以本文為準**，視覺稿只是氛圍與構圖參考。
+> ⚠️ **本節為視覺主規範**。§1–§13 描述 token、元件結構與互動細節，
+> 但**整體調性、版型節奏、佈景明暗、攝影 vs 圖示的選擇**，以本節兩張 PNG 為唯一準則。
+> 當 token 細節與 mockup 整體感衝突時，**改 token 去迎合 mockup**，不要反過來。
 
 ### 14.1 首頁總覽 — `references/homepage-mockup.png`
 桌機版首頁全景示意，可用來對齊 §6.1 首頁範本的節奏。

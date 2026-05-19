@@ -249,7 +249,7 @@ p { line-height: 1.7; }
   height: var(--control-md);
   padding-inline: var(--space-3);
   border-radius: var(--radius-input);
-  background: var(--bg-elevated);
+  background: var(--bg-base);
   border: 1px solid var(--border-subtle);
   color: var(--fg-primary);
   font-size: var(--text-base);

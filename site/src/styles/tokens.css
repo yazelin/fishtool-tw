@@ -84,30 +84,34 @@
   --duration-base: 200ms;
   --duration-slow: 300ms;
 
-  /* === 主題：預設 Dark === */
-  color-scheme: dark;
-  --bg-base: var(--ink-900);
-  --bg-elevated: var(--ink-800);
-  --bg-elevated-hover: var(--ink-700);
-  --fg-primary: var(--ink-100);
-  --fg-secondary: var(--ink-300);
-  --fg-muted: var(--ink-500);
-  --border-subtle: var(--ink-500);
-  --link: var(--brand-tide);
-  --link-hover: #2A9BA5;
-}
-
-[data-theme='light'] {
+  /* === 主題：預設 Light（依 design.md §14 mockup）=== */
   color-scheme: light;
-  --bg-base: var(--ink-050);
+  --bg-base: #FFFFFF;
+  --bg-soft: var(--ink-050);
   --bg-elevated: #FFFFFF;
   --bg-elevated-hover: var(--gray-100);
   --fg-primary: var(--gray-900);
   --fg-secondary: var(--gray-700);
   --fg-muted: var(--gray-500);
   --border-subtle: var(--gray-300);
+  --border-soft: var(--gray-100);
   --link: var(--brand-tide-strong);
   --link-hover: var(--brand-tide);
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+  --bg-base: var(--ink-900);
+  --bg-soft: var(--ink-800);
+  --bg-elevated: var(--ink-800);
+  --bg-elevated-hover: var(--ink-700);
+  --fg-primary: var(--ink-100);
+  --fg-secondary: var(--ink-300);
+  --fg-muted: var(--ink-500);
+  --border-subtle: var(--ink-500);
+  --border-soft: var(--ink-700);
+  --link: var(--brand-tide);
+  --link-hover: #2A9BA5;
 }
 
 @media (prefers-reduced-motion: reduce) {

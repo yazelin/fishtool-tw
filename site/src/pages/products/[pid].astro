@@ -2,7 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import ProductCard from '../../components/ProductCard.astro';
-import { loadProductMap, extractBrand, pickThumb, formatPrice } from '../../lib/data';
+import { loadProductMap, extractBrand, pickThumb, pickGallery, formatPrice } from '../../lib/data';
 
 // SSR：商品數量太多（>20K），改成每次請求即時 render，避免 build 兩萬頁
 const pid = Number(Astro.params.pid);
@@ -23,13 +23,8 @@ const related = product.related_pids
   .filter((p): p is NonNullable<typeof p> => !!p)
   .slice(0, 6);
 
-const heroImage = product.detail_images[0] ?? product.thumb_images[0] ?? null;
-const gallery = Array.from(
-  new Set([
-    ...(product.detail_images ?? []),
-    ...(product.thumb_images ?? []),
-  ].filter(Boolean) as string[]),
-);
+const gallery = pickGallery(product);
+const heroImage = gallery[0] ?? null;
 ---
 
 <Base title={product.name ?? `商品 ${product.pid}`}>
@@ -172,7 +167,8 @@ const gallery = Array.from(
   .gallery { display: flex; flex-direction: column; gap: var(--space-3); }
   .hero-img {
     aspect-ratio: 1;
-    background: var(--bg-elevated);
+    background: var(--bg-soft);
+    border: 1px solid var(--border-soft);
     border-radius: var(--radius-lg);
     display: grid;
     place-items: center;
@@ -192,8 +188,8 @@ const gallery = Array.from(
   .thumb-btn {
     aspect-ratio: 1;
     padding: 0;
-    background: var(--bg-elevated);
-    border: 1px solid transparent;
+    background: var(--bg-soft);
+    border: 1px solid var(--border-soft);
     border-radius: var(--radius-sm);
     overflow: hidden;
     cursor: pointer;
@@ -253,7 +249,8 @@ const gallery = Array.from(
     list-style: none;
     padding: var(--space-4);
     margin: 0;
-    background: var(--bg-elevated);
+    background: var(--bg-soft);
+    border: 1px solid var(--border-soft);
     border-radius: var(--radius-md);
     display: grid;
     gap: var(--space-3);
