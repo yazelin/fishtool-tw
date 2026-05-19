@@ -8,82 +8,94 @@
 
 ## 1. 設計理念（Design Principles）
 
+> **客群定位**：成功人士的休閒釣魚生活。
+> 不做平價電商風、不做花車感、不做廉價特價貼。
+> 目標品牌氣質：Orvis × Monocle × YETI Premium × Patek Philippe 的混血。
+
 | 原則 | 內容 |
 | --- | --- |
-| **海洋感而不土味** | 取海色不取俗藍；磯岩、深海、夜釣的層次感取代螢光與爆炸特價貼 |
-| **裝備感** | 像戶外品牌（Patagonia、YETI、Daiwa Global、Shimano Premium）那樣，把器材視為精選器物，不是百貨花車 |
-| **資訊密度高但有節奏** | 釣具 SKU 多、規格細，需要排得密但不亂；用節奏感取代留白浪費 |
-| **內容驅動** | 商品圖、規格、編號、價格才是主角；裝飾、特效退到輔助 |
-| **跨裝置一致** | 手機是主要購買裝置（原站已有 mobile_*.css），桌機只是更舒展，不是另一種風格 |
-| **可長期維護** | 商品資料來自定時 DB → JSON，UI 不可以與資料 schema 強耦合 |
+| **節制（Restraint）** | 留白優先、顏色少、字體少、動畫少。多即是少 |
+| **編輯感（Editorial）** | 像高端雜誌而非電商；攝影為主、文案為輔、商品為主角 |
+| **暖色而不冰冷** | 米色 + 暖炭 + 黃銅金，**不用冰冷的海藍青/螢光橘** |
+| **襯線氣質** | 標題用襯線字（雜誌感、世襲感）；內文保留無襯線好讀 |
+| **昂貴感** | 商品卡無框、價格不誇張、特價標收斂為小斜體 `Sale` |
+| **跨裝置一致** | 手機桌機同一份視覺語言、不另開花俏行動版 |
+| **可長期維護** | 商品資料來自定時 DB → JSON，UI 不可與 schema 強耦合 |
 
 ---
 
 ## 2. 色彩系統（Color Tokens）
 
-### 2.1 主色：深海（Deep Sea）
-模擬磯岸夜釣與深水船釣的氛圍，作為品牌主色與整體背景基調。
+> **設計方向 v0.3：Premium / Editorial**
+> 主色 = **米色紙感 + 暖炭墨黑 + 黃銅金**。
+> 全面**棄用**舊版的海藍青 (`#0E7C86`) 與螢光橘 (`#E15D2F`)。
+
+### 2.1 紙與墨（Paper & Ink）
+雜誌書感的暖色基底，是整站背景基調。
 
 | Token | HEX | 用途 |
 | --- | --- | --- |
-| `--ink-900` | `#0B1B2B` | 主背景（深色模式預設） |
-| `--ink-800` | `#11293E` | 卡片/容器底色 |
-| `--ink-700` | `#1B3950` | hover、選中態的容器底色 |
-| `--ink-500` | `#2F5874` | 分隔線（深色模式） |
-| `--ink-300` | `#6F8AA3` | 次級文字（深色模式） |
-| `--ink-100` | `#D7E2EC` | 主要文字（深色模式） |
-| `--ink-050` | `#F4F7FA` | 主背景（淺色模式） |
+| `--cream-050` | `#F5F1E8` | 主背景（淺色模式預設）｜溫米紙感 |
+| `--cream-100` | `#EEE8DA` | 卡片/容器底色（淺色模式） |
+| `--cream-200` | `#E2DAC8` | 分隔線、極輕量邊框（淺色模式） |
+| `--ink-900` | `#1A1816` | 主背景（深色模式預設）｜暖炭近黑、略偏咖啡 |
+| `--ink-800` | `#25211D` | 卡片底色（深色模式） |
+| `--ink-700` | `#332E28` | hover 容器（深色模式） |
+| `--ink-500` | `#5C5249` | 次級文字（深色模式） |
+| `--ink-300` | `#A89D8E` | 輔助文字（深色模式） |
+| `--ink-100` | `#F5F1E8` | 主要文字（深色模式）= 米色 |
+| `--ink-text` | `#2A2622` | 主要文字（淺色模式）｜不用純黑、暖一點 |
+| `--ink-text-soft` | `#5C5249` | 次級文字（淺色模式） |
 
-### 2.2 強調色：磯岩與漁火
-取自磯岸礁石、漁港燈火、夕陽下的海面反光，作為價格、CTA、特價標的點綴。
+### 2.2 黃銅金（Brass）— 品牌主色
+取自老式釣具魚鉤、刻度、雕版漆面的金屬反光。**鏈接、按鈕、focus、品牌 mark**。
 
 | Token | HEX | 用途 |
 | --- | --- | --- |
-| `--brand-tide` | `#0E7C86` | 品牌色（鏈接、按鈕填色、focus ring）。中度藍綠 |
-| `--brand-tide-strong` | `#0A5F66` | 按鈕 hover/按下 |
-| `--brand-tide-soft` | `#E7F4F5` | 高亮背景、tag |
-| `--accent-ember` | `#E15D2F` | 特價標、限量、優惠標籤（克制使用） |
-| `--accent-amber` | `#F4B400` | 評等、會員等級、推薦徽章 |
-| `--accent-kelp` | `#3F7D4E` | 庫存正常、訂單已完成等正向狀態 |
+| `--brass-500` | `#A88862` | 品牌主色｜鏈接、CTA 邊框、mark |
+| `--brass-700` | `#7B6242` | hover、按下、深底上的對比版 |
+| `--brass-300` | `#C9B292` | 淺底上的次要強調 |
+| `--brass-soft` | `#F0E6D2` | tag 背景、選中態 |
 
-> **特價標規範**：用 `--accent-ember` 純色實心徽章 + 白字，避免使用紅色霓虹漸層。
+### 2.3 深酒紅（Ember Wine）— 唯一警示/特價色
+舊版鮮橘退場，改為單寧暗紅。**只用於 sale 標、限量、缺貨警示**，且樣式收斂為小斜體文字而非實心徽章。
 
-### 2.3 中性灰（淺色模式 / 表單）
 | Token | HEX | 用途 |
 | --- | --- | --- |
-| `--gray-900` | `#1F2937` | 文字主色（淺色模式） |
-| `--gray-700` | `#4B5563` | 次級文字 |
-| `--gray-500` | `#9CA3AF` | placeholder |
-| `--gray-300` | `#D1D5DB` | 邊框、分隔線 |
-| `--gray-100` | `#F3F4F6` | 卡片背景 |
+| `--ember-600` | `#8B2C1F` | 特價、限量小字 |
+| `--ember-soft` | `#F2E2DD` | 警示底色（極少用） |
 
-### 2.4 語義色
+### 2.4 語義色（不變）
 | Token | HEX | 用途 |
 | --- | --- | --- |
-| `--status-success` | `#10B981` | 成功 |
-| `--status-warning` | `#F59E0B` | 警告 |
-| `--status-error` | `#EF4444` | 錯誤 |
-| `--status-info` | `#3B82F6` | 資訊 |
+| `--status-success` | `#3F7D4E` | 庫存正常、訂單完成 |
+| `--status-warning` | `#A88862` | 警告（沿用 brass） |
+| `--status-error` | `#8B2C1F` | 錯誤、移除 |
+| `--status-info` | `#5C5249` | 資訊提示 |
 
 ### 2.5 雙模式（Light / Dark）
-- **預設 = Light**（依 mockup 與電商實務：白底攝影感、商品為主角）
-- Hero、Footer、Brand wall 等局部用深色（`--ink-900`）作為氣勢區塊
-- 使用者可切 Dark：用 `prefers-color-scheme` + 手動 toggle
-- 切換策略：用 CSS 變數對應到 `[data-theme="dark"]` 與 `[data-theme="light"]`
+**Light 與 Dark 都是品牌主視覺**，不是「主+輔」。
+- **Light** = 雜誌米色紙感，書本翻開的靜謐
+- **Dark** = 高端 lounge 夜晚感，**暖炭黑而非冰冷 navy**
+- 預設 Light（白天時段、大多數使用情境）；右上 toggle 切 Dark
+- 兩種模式都用同一組標題襯線字、同一組品牌 brass，差別只在背景/文字明度
+- **特價標斜體小字 `Sale` 在兩個模式都是 ember-600 紅**，不變色
 
 ---
 
 ## 3. 字體系統（Typography）
 
-### 3.1 字型選擇
+### 3.1 字型選擇（v0.3：襯線標題、無襯線內文）
 | 用途 | 字體（候選） | 備援 |
 | --- | --- | --- |
-| **中文主體** | Noto Sans TC（思源黑體 / Source Han Sans TC） | system-ui, "PingFang TC", "Microsoft JhengHei" |
-| **英文/數字** | Inter | -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto |
-| **數字（價格）** | Inter Tabular Nums (`font-variant-numeric: tabular-nums`) | — |
-| **品牌/標題（可選）** | Bebas Neue 或 Anton（粗壯展示字） | Inter Black |
+| **中文標題（h1-h3）** | **Noto Serif TC**（思源宋體） | "PingFang TC", "Songti TC", serif |
+| **英文標題 / 品牌字標** | **Cormorant Garamond Italic** 或 EB Garamond Italic | "Times New Roman", Georgia, serif |
+| **中文內文** | Noto Sans TC | system-ui, "PingFang TC", "Microsoft JhengHei" |
+| **英文/數字內文** | Inter | -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto |
+| **數字（價格）** | Inter Tabular Nums | — |
+| **uppercase nav / eyebrow / label** | Inter，字距 0.18em | — |
 
-避免使用：標楷體、新細明體、Comic Sans、Times New Roman。
+避免使用：標楷體、新細明體、Comic Sans、粗壯展示字（Bebas/Anton 已退場）。
 
 ### 3.2 字級階層（rem，以 16px 為基準）
 
@@ -407,6 +419,7 @@
 | --- | --- | --- |
 | v0.1 | 2026-05-18 | 初稿：色彩、字體、間距、元件、頁面範本、圖像方向、Tone |
 | v0.2 | 2026-05-19 | 加入 §14 參考視覺稿（首頁 mockup、設計系統總覽） |
+| v0.3 | 2026-05-19 | **Premium pivot**：色票全換為米色 + 暖炭 + 黃銅金（棄海藍青/螢光橘）；標題改襯線（Noto Serif TC + Cormorant Garamond）；客群明確定位為「成功人士的休閒釣魚生活」；§14 兩張 mockup 重生成為 light + dark 雙版 |
 
 ---
 
@@ -416,7 +429,7 @@
 > 但**整體調性、版型節奏、佈景明暗、攝影 vs 圖示的選擇**，以本節兩張 PNG 為唯一準則。
 > 當 token 細節與 mockup 整體感衝突時，**改 token 去迎合 mockup**，不要反過來。
 
-### 14.1 首頁總覽 — `references/homepage-mockup.png`
+### 14.1 首頁總覽（Light Mode）— `references/homepage-mockup.png`
 桌機版首頁全景示意，可用來對齊 §6.1 首頁範本的節奏。
 
 涵蓋區塊（由上至下）：
@@ -440,7 +453,7 @@
 - 視覺稿上的 nav 為 7 項精簡版，本站實際為 §5.1 提到的 **11 大類**，實作時以本文為準
 - 視覺稿 hero 是右上排深海色票條，僅為設計示意，**正式上線不會出現色票條**
 
-### 14.2 設計系統總覽 — `references/design-system-overview.png`
+### 14.2 首頁總覽（Dark Mode）— `references/design-system-overview.png`
 單張海報式 style guide，把品牌主色、字體、按鈕、icon、卡片、banner、mobile mockup 全部攤平在同一張畫面，方便目視對齊。
 
 涵蓋區塊：

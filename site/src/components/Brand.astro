@@ -1,5 +1,5 @@
 ---
-// 紅海釣具品牌識別：魚鉤 + 海浪幾何 mark + 中英字標
+// 紅海釣具 v0.3 品牌識別：黃銅金 + 暖炭墨 + 襯線 italic 字標
 // 用法：
 //   <Brand />                       — 預設 md，full（mark + 字標）
 //   <Brand size="lg" />
@@ -20,10 +20,10 @@ const {
 } = Astro.props;
 
 const markPx = {
-  sm: 24,
-  md: 32,
-  lg: 40,
-  xl: 56,
+  sm: 22,
+  md: 28,
+  lg: 38,
+  xl: 54,
 }[size];
 
 const Wrapper = href ? 'a' : 'span';
@@ -32,18 +32,20 @@ const Wrapper = href ? 'a' : 'span';
 <Wrapper class:list={["brand", `size-${size}`, `variant-${variant}`, `tone-${tone}`]} {...(href ? { href } : {})}>
   {variant !== 'wordmark' && (
     <span class="mark" aria-hidden="true">
-      <svg viewBox="0 0 64 64" width={markPx} height={markPx} xmlns="http://www.w3.org/2000/svg">
-        <rect class="mark-bg" width="64" height="64" rx="14" />
-        <path class="mark-hook" d="M32 14 L32 36 a10 10 0 0 1 -20 0 L12 34" fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
-        <circle class="mark-eye" cx="32" cy="13" r="2.6" />
-        <path class="mark-wave" d="M10 50 Q19 46 28 50 T46 50 T56 50" fill="none" stroke-width="3" stroke-linecap="round" />
+      <svg viewBox="0 0 48 48" width={markPx} height={markPx} xmlns="http://www.w3.org/2000/svg">
+        {/* 圓底（薄）*/}
+        <circle class="mark-bg" cx="24" cy="24" r="22" fill="none" stroke-width="1.2" />
+        {/* 魚鉤 */}
+        <path class="mark-hook" d="M24 12 V28 a7 7 0 0 1 -14 0 L10 27.5"
+              fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        <circle class="mark-eye" cx="24" cy="11.4" r="1.9" />
       </svg>
     </span>
   )}
   {variant !== 'mark' && (
     <span class="wordmark">
+      <span class="en">FishTool<span class="dot">.</span>tw</span>
       <span class="cn">紅海釣具</span>
-      <span class="en">FishTool.tw</span>
     </span>
   )}
 </Wrapper>
@@ -60,52 +62,54 @@ const Wrapper = href ? 'a' : 'span';
 
   .mark { display: inline-grid; flex-shrink: 0; }
   .mark svg { display: block; }
-  .mark-bg { fill: var(--ink-900); }
-  .mark-hook { stroke: var(--accent-ember); }
-  .mark-eye { fill: var(--accent-ember); }
-  .mark-wave { stroke: var(--brand-tide); }
+  /* 預設 light tone */
+  .mark-bg { stroke: var(--brass-500); }
+  .mark-hook { stroke: var(--ink-text); }
+  .mark-eye { fill: var(--brass-700); }
 
-  /* 反白版（深底頁面） */
-  .tone-dark .mark-bg { fill: #fff; fill-opacity: 0.08; }
-  .tone-dark .mark-hook,
-  .tone-dark .mark-eye { stroke: var(--accent-ember); fill: var(--accent-ember); }
-  .tone-dark .mark-wave { stroke: var(--brand-tide-soft); stroke-opacity: 0.85; }
+  .tone-dark .mark-bg { stroke: var(--brass-300); }
+  .tone-dark .mark-hook { stroke: var(--cream-050); }
+  .tone-dark .mark-eye { fill: var(--brass-500); }
 
+  /* 字標 — 英文襯線斜體（主）+ 中文襯線（副） */
   .wordmark {
     display: inline-flex;
     flex-direction: column;
-    line-height: 1;
-    color: var(--ink-900);
-    font-weight: 700;
+    line-height: 1.05;
   }
-  .tone-dark .wordmark { color: #fff; }
+
+  .en {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 500;
+    color: var(--ink-text);
+    letter-spacing: -0.005em;
+  }
+  .en .dot { color: var(--brass-500); }
+  .tone-dark .en { color: var(--cream-050); }
+  .tone-dark .en .dot { color: var(--brass-300); }
 
   .cn {
-    font-weight: 700;
-    letter-spacing: 0.02em;
-  }
-  .en {
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    color: var(--ink-500);
+    font-family: var(--font-serif-cn);
+    font-weight: 500;
+    color: var(--ink-text-soft);
     margin-top: 4px;
-    font-style: italic;
+    letter-spacing: 0.12em;
   }
-  .tone-dark .en { color: rgba(255, 255, 255, 0.55); }
+  .tone-dark .cn { color: var(--ink-300); }
 
   /* 尺寸 */
-  .size-sm .cn { font-size: 14px; }
-  .size-sm .en { font-size: 10px; margin-top: 2px; }
+  .size-sm .en { font-size: 16px; }
+  .size-sm .cn { font-size: 10px; letter-spacing: 0.18em; margin-top: 2px; }
 
-  .size-md .cn { font-size: 18px; }
-  .size-md .en { font-size: 11.5px; }
+  .size-md .en { font-size: 22px; }
+  .size-md .cn { font-size: 11px; letter-spacing: 0.2em; }
 
-  .size-lg .cn { font-size: 22px; }
-  .size-lg .en { font-size: 13px; }
+  .size-lg .en { font-size: 28px; }
+  .size-lg .cn { font-size: 13px; }
 
-  .size-xl .cn { font-size: 32px; }
-  .size-xl .en { font-size: 16px; margin-top: 6px; }
+  .size-xl .en { font-size: 42px; }
+  .size-xl .cn { font-size: 16px; margin-top: 8px; }
 
-  /* hover 時整體不變色（保留識別） */
-  a.brand:hover { color: inherit; opacity: 0.9; }
+  a.brand:hover { color: inherit; opacity: 0.85; }
 </style>

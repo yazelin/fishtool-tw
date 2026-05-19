@@ -111,15 +111,24 @@ import { url } from '../lib/data';
     color: var(--ink-100);
     margin-bottom: var(--space-3);
   }
-  .footer-brand .brand-cn { font-size: var(--text-xl); font-weight: 700; }
-  .footer-brand .brand-en {
-    font-size: 13px;
-    letter-spacing: 0.04em;
-    color: var(--ink-500);
+  .footer-brand .brand-cn {
+    font-size: var(--text-base);
+    font-family: var(--font-serif-cn);
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    order: 2;
     margin-top: 4px;
-    font-style: italic;
   }
-  .brand-desc { font-size: var(--text-sm); line-height: 1.7; }
+  .footer-brand .brand-en {
+    font-size: 22px;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    color: var(--cream-050);
+    order: 1;
+  }
+  .brand-desc { font-size: var(--text-sm); line-height: 1.85; max-width: 38ch; }
 
   .social-row {
     display: flex;
