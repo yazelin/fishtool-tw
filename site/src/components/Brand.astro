@@ -62,11 +62,16 @@ const Wrapper = href ? 'a' : 'span';
 
   .mark { display: inline-grid; flex-shrink: 0; }
   .mark svg { display: block; }
-  /* 預設 light tone */
+  /* 用 fg-primary 讓 mark 自動跟主題走 */
   .mark-bg { stroke: var(--brass-500); }
-  .mark-hook { stroke: var(--ink-text); }
+  .mark-hook { stroke: var(--fg-primary); }
   .mark-eye { fill: var(--brass-700); }
 
+  /* dark theme：圓圈跟眼點改用較亮的金，hook 用 cream（fg-primary 已是 cream，不必再寫）*/
+  :global([data-theme='dark']) .mark-bg { stroke: var(--brass-300); }
+  :global([data-theme='dark']) .mark-eye { fill: var(--brass-500); }
+
+  /* tone="dark" 顯式（在淺底頁面要用反白版）：強制使用 dark 變體 */
   .tone-dark .mark-bg { stroke: var(--brass-300); }
   .tone-dark .mark-hook { stroke: var(--cream-050); }
   .tone-dark .mark-eye { fill: var(--brass-500); }
@@ -82,17 +87,20 @@ const Wrapper = href ? 'a' : 'span';
     font-family: var(--font-serif);
     font-style: italic;
     font-weight: 500;
-    color: var(--ink-text);
+    color: var(--fg-primary);
     letter-spacing: -0.005em;
   }
   .en .dot { color: var(--brass-500); }
+  :global([data-theme='dark']) .en .dot { color: var(--brass-300); }
+
+  /* 顯式反白版（淺底時偶爾要強制反白）*/
   .tone-dark .en { color: var(--cream-050); }
   .tone-dark .en .dot { color: var(--brass-300); }
 
   .cn {
     font-family: var(--font-serif-cn);
     font-weight: 500;
-    color: var(--ink-text-soft);
+    color: var(--fg-secondary);
     margin-top: 4px;
     letter-spacing: 0.12em;
   }
