@@ -1,4 +1,6 @@
 ---
+export const prerender = true;
+
 import Base from '../layouts/Base.astro';
 ---
 
@@ -9,86 +11,120 @@ import Base from '../layouts/Base.astro';
       <p>商品問題、訂單疑問、缺料補貨——這裡留言給我們。</p>
     </header>
 
-    <form class="form" onsubmit="return false">
-      <label>
-        姓名 / 暱稱
-        <input type="text" name="name" required />
-      </label>
-      <label>
-        Email
-        <input type="email" name="email" required placeholder="正確信箱才能即時回覆" />
-      </label>
-      <label>
-        商品編號（選填）
-        <input type="text" name="sku" placeholder="例如 DM-216276" />
-      </label>
-      <label>
-        詢問內容
-        <textarea name="message" rows="6" required></textarea>
-      </label>
-      <div class="actions">
-        <button type="submit" class="btn btn-primary" disabled>送出（後端尚未實作）</button>
-      </div>
-    </form>
+    <div class="layout">
+      <form class="form" onsubmit="return false">
+        <div class="field">
+          <label class="field-label" for="iq-name">
+            姓名 / 暱稱 <span class="field-required" aria-hidden="true">*</span>
+          </label>
+          <input id="iq-name" class="input" type="text" name="name" required aria-required="true" />
+        </div>
 
-    <aside class="contact-aside">
-      <h2>其他聯絡方式</h2>
-      <ul>
-        <li>Email：<a href="mailto:service@fishtool.tw">service@fishtool.tw</a></li>
-        <li>線上聊聊：10:00 – 21:00</li>
-        <li>
-          <a href="https://www.facebook.com/groups/809912915726639/" target="_blank" rel="noopener">
-            Facebook 社團
-          </a>
-        </li>
-      </ul>
-    </aside>
+        <div class="field">
+          <label class="field-label" for="iq-email">
+            Email <span class="field-required" aria-hidden="true">*</span>
+          </label>
+          <input id="iq-email" class="input" type="email" name="email" required aria-required="true" placeholder="service@example.com" />
+          <span class="field-hint">正確信箱才能即時收到回覆。</span>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="iq-sku">商品編號（選填）</label>
+          <input id="iq-sku" class="input" type="text" name="sku" placeholder="例如 DM-216276" />
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="iq-msg">
+            詢問內容 <span class="field-required" aria-hidden="true">*</span>
+          </label>
+          <textarea id="iq-msg" class="textarea" name="message" rows="6" required aria-required="true"></textarea>
+        </div>
+
+        <div class="actions">
+          <button type="submit" class="btn btn-primary btn-lg" disabled aria-disabled="true">送出（後端尚未實作）</button>
+        </div>
+      </form>
+
+      <aside class="contact-aside">
+        <h2>其他聯絡方式</h2>
+        <ul>
+          <li>
+            <span class="aside-key">Email</span>
+            <a href="mailto:service@fishtool.tw">service@fishtool.tw</a>
+          </li>
+          <li>
+            <span class="aside-key">線上聊聊</span>
+            10:00 – 21:00
+          </li>
+          <li>
+            <span class="aside-key">社群</span>
+            <a href="https://www.facebook.com/groups/809912915726639/" target="_blank" rel="noopener">
+              Facebook 社團
+            </a>
+          </li>
+          <li>
+            <span class="aside-key">門市</span>
+            實體門市可預約自取
+          </li>
+        </ul>
+      </aside>
+    </div>
   </div>
 </Base>
 
 <style>
   .head { margin-block: var(--space-5) var(--space-6); }
-  .head p { color: var(--fg-secondary); margin-top: var(--space-2); }
+  .head p { color: var(--fg-secondary); margin-top: var(--space-2); font-size: var(--text-sm); }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+  }
+  @media (min-width: 900px) {
+    .layout { grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr); gap: var(--space-7); }
+  }
 
   .form {
     display: grid;
-    gap: var(--space-4);
-    max-width: var(--article-max);
+    gap: var(--space-5);
     background: var(--bg-elevated);
     padding: var(--space-6);
     border-radius: var(--radius-md);
-  }
-  .form label {
-    display: grid;
-    gap: var(--space-2);
-    font-size: var(--text-sm);
-    color: var(--fg-secondary);
-  }
-  .form input,
-  .form textarea {
-    width: 100%;
-    padding: var(--space-3);
-    border-radius: var(--radius-sm);
-    background: var(--bg-base);
     border: 1px solid var(--border-subtle);
-    color: var(--fg-primary);
-    font-size: var(--text-base);
   }
-  .form input:focus,
-  .form textarea:focus {
-    border-color: var(--brand-tide);
-  }
-
   .actions { margin-top: var(--space-2); }
-  .actions .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  .actions .btn { width: 100%; }
 
   .contact-aside {
-    margin-top: var(--space-6);
     padding: var(--space-5);
     background: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
-    max-width: var(--article-max);
+    align-self: start;
   }
-  .contact-aside h2 { font-size: var(--text-lg); margin-bottom: var(--space-3); }
-  .contact-aside ul { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--space-2); color: var(--fg-secondary); }
+  .contact-aside h2 {
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-4);
+  }
+  .contact-aside ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: var(--space-3);
+    color: var(--fg-primary);
+    font-size: var(--text-sm);
+  }
+  .contact-aside li {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    align-items: baseline;
+    gap: var(--space-3);
+  }
+  .aside-key {
+    color: var(--fg-muted);
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+  }
 </style>

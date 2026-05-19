@@ -9,6 +9,10 @@ site/dist/
 site/.astro/
 .astro/
 
+# Vercel
+site/.vercel/
+.vercel/
+
 # Build outputs
 dist/
 build/

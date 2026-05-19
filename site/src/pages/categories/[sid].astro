@@ -1,9 +1,11 @@
 ---
+export const prerender = true;
+
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import ProductCard from '../../components/ProductCard.astro';
-import { loadProductMap, extractBrand, pickThumb } from '../../lib/data';
+import { loadProductMap, loadMenuList, loadCategoryMap, extractBrand, pickThumb, url } from '../../lib/data';
 
 export async function getStaticPaths() {
   const cats = await getCollection('categories');
@@ -15,79 +17,339 @@ export async function getStaticPaths() {
 
 const { category } = Astro.props;
 const products = await loadProductMap();
+const menus = await loadMenuList();
+const catMap = await loadCategoryMap();
 
 const items = category.all_product_ids
   .map((pid) => products.get(pid))
   .filter((p): p is NonNullable<typeof p> => p !== undefined);
 
 const crumbs = category.breadcrumb.map((label) => ({ label }));
+
+// 找出當前分類所屬大類
+const parentMenu = menus.find((m) => m.subcategories.some((s) => s.sid === category.sid));
+
+// 收集此分類內前 N 個品牌（用於 chip filter）
+const brandCount = new Map<string, number>();
+for (const p of items) {
+  const b = extractBrand(p.name);
+  if (b) brandCount.set(b, (brandCount.get(b) ?? 0) + 1);
+}
+const topBrands = Array.from(brandCount.entries())
+  .sort((a, b) => b[1] - a[1])
+  .slice(0, 8)
+  .map(([name, n]) => ({ name, n }));
+
+const hasSaleAny = items.some(
+  (p) => p.price != null && p.sale_price != null && (p.sale_price as number) < (p.price as number),
+);
 ---
 
 <Base title={category.name}>
-  <div class="container">
+  <div class="container page">
     <Breadcrumb items={crumbs.length > 0 ? crumbs : [{ label: category.name }]} />
 
     <header class="page-head">
       <h1>{category.name}</h1>
-      <p>共 {category.total_count.toLocaleString('zh-Hant')} 件商品</p>
+      <p>共 <strong>{category.total_count.toLocaleString('zh-Hant')}</strong> 件商品</p>
     </header>
 
-    <div class="toolbar">
-      <div class="sort">
-        <label>排序</label>
-        <select disabled aria-label="排序方式">
-          <option>上架日期：新到舊</option>
-          <option>價格：低到高</option>
-          <option>價格：高到低</option>
-        </select>
-      </div>
-      <div class="meta">顯示 {items.length} / {category.total_count}</div>
-    </div>
+    <div class="layout">
+      <aside class="sidebar" aria-label="分類導航">
+        <div class="side-block">
+          <h2>釣具大類</h2>
+          <ul class="menu-tree">
+            {menus.map((m) => {
+              const isCurrent = m.menu_id === parentMenu?.menu_id;
+              return (
+                <li>
+                  <details open={isCurrent}>
+                    <summary>
+                      <a href={url(`menus/${m.menu_id}`)}>{m.name}</a>
+                      <span class="count">{m.subcategories.length}</span>
+                    </summary>
+                    <ul class="sub-list">
+                      {m.subcategories.map((s) => {
+                        const sub = catMap.get(s.sid);
+                        const isActive = s.sid === category.sid;
+                        return (
+                          <li class={isActive ? 'is-active' : ''}>
+                            <a href={url(`categories/${s.sid}`)}>{s.name}</a>
+                            <span class="count">{sub?.total_count ?? 0}</span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </details>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </aside>
 
-    {items.length > 0 ? (
-      <div class="grid-cards">
-        {items.map((p) => (
-          <ProductCard
-            pid={p.pid}
-            sku={p.sku}
-            name={p.name}
-            price={p.price}
-            salePrice={p.sale_price}
-            thumb={pickThumb(p)}
-            brand={extractBrand(p.name)}
-          />
-        ))}
-      </div>
-    ) : (
-      <p class="empty">這個分類目前還沒有商品資料。</p>
-    )}
+      <main class="content">
+        <div class="toolbar" role="toolbar" aria-label="篩選與排序">
+          <div class="chips" id="chipBar">
+            {hasSaleAny && (
+              <button type="button" class="btn btn-pill" data-filter="sale" aria-pressed="false">特價</button>
+            )}
+            {topBrands.map((b) => (
+              <button type="button" class="btn btn-pill" data-filter="brand" data-value={b.name} aria-pressed="false">
+                {b.name} <span class="chip-count">{b.n}</span>
+              </button>
+            ))}
+            <button type="button" class="chip-clear" id="chipClear" hidden>清除全部</button>
+          </div>
+          <div class="sort">
+            <label for="sortSel">排序</label>
+            <select id="sortSel" class="select" aria-label="排序方式">
+              <option value="default">建議排序</option>
+              <option value="new">上架：新到舊</option>
+              <option value="old">上架：舊到新</option>
+              <option value="price-asc">價格：低到高</option>
+              <option value="price-desc">價格：高到低</option>
+            </select>
+          </div>
+        </div>
+
+        <p class="result-count"><span id="resultCount">{items.length}</span> / {category.total_count} 件</p>
+
+        {items.length > 0 ? (
+          <div class="grid-cards" id="cardGrid">
+            {items.map((p) => {
+              const hasSale = p.price != null && p.sale_price != null && (p.sale_price as number) < (p.price as number);
+              const effectivePrice = (p.sale_price ?? p.price ?? 0) as number;
+              return (
+                <div
+                  class="card-wrap"
+                  data-brand={extractBrand(p.name) ?? ''}
+                  data-sale={hasSale ? '1' : '0'}
+                  data-price={effectivePrice}
+                  data-pid={p.pid}
+                >
+                  <ProductCard
+                    pid={p.pid}
+                    sku={p.sku}
+                    name={p.name}
+                    price={p.price}
+                    salePrice={p.sale_price}
+                    thumb={pickThumb(p)}
+                    brand={extractBrand(p.name)}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <p class="empty">這個分類目前還沒有商品資料，先去看看其他分類吧。</p>
+        )}
+      </main>
+    </div>
   </div>
+
+  <script is:inline>
+    (() => {
+      const grid = document.getElementById('cardGrid');
+      if (!grid) return;
+      const chipBar = document.getElementById('chipBar');
+      const sortSel = document.getElementById('sortSel');
+      const resultCount = document.getElementById('resultCount');
+      const clearBtn = document.getElementById('chipClear');
+      const active = { sale: false, brand: new Set() };
+
+      function apply() {
+        const wraps = Array.from(grid.children);
+        let visible = 0;
+        for (const w of wraps) {
+          let ok = true;
+          if (active.sale && w.dataset.sale !== '1') ok = false;
+          if (active.brand.size > 0 && !active.brand.has(w.dataset.brand)) ok = false;
+          w.style.display = ok ? '' : 'none';
+          if (ok) visible++;
+        }
+        resultCount.textContent = visible;
+        clearBtn.hidden = !(active.sale || active.brand.size > 0);
+
+        // 排序
+        const mode = sortSel.value;
+        if (mode !== 'default') {
+          const arr = wraps.slice().sort((a, b) => {
+            const pa = parseFloat(a.dataset.price) || 0;
+            const pb = parseFloat(b.dataset.price) || 0;
+            const ida = parseInt(a.dataset.pid) || 0;
+            const idb = parseInt(b.dataset.pid) || 0;
+            if (mode === 'price-asc') return pa - pb;
+            if (mode === 'price-desc') return pb - pa;
+            if (mode === 'new') return idb - ida;
+            if (mode === 'old') return ida - idb;
+            return 0;
+          });
+          for (const node of arr) grid.appendChild(node);
+        }
+      }
+
+      chipBar?.addEventListener('click', (e) => {
+        const btn = e.target.closest('button[data-filter]');
+        if (!btn) return;
+        const kind = btn.dataset.filter;
+        const value = btn.dataset.value;
+        const pressed = btn.getAttribute('aria-pressed') === 'true';
+        btn.setAttribute('aria-pressed', String(!pressed));
+        if (kind === 'sale') active.sale = !pressed;
+        if (kind === 'brand') {
+          if (pressed) active.brand.delete(value);
+          else active.brand.add(value);
+        }
+        apply();
+      });
+
+      clearBtn?.addEventListener('click', () => {
+        active.sale = false;
+        active.brand.clear();
+        chipBar.querySelectorAll('button[data-filter]').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+        apply();
+      });
+
+      sortSel?.addEventListener('change', apply);
+    })();
+  </script>
 </Base>
 
 <style>
+  .page { padding-bottom: var(--space-8); }
   .page-head { margin-block: var(--space-5) var(--space-5); }
   .page-head h1 { font-size: var(--text-3xl); }
-  .page-head p { color: var(--fg-secondary); margin-top: var(--space-2); }
+  .page-head p { color: var(--fg-secondary); margin-top: var(--space-2); font-size: var(--text-sm); }
+  .page-head strong { color: var(--fg-primary); font-weight: 600; }
 
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+  }
+  @media (min-width: 1024px) {
+    .layout { grid-template-columns: 220px minmax(0, 1fr); gap: var(--space-6); }
+  }
+
+  /* === Sidebar === */
+  .sidebar { display: none; }
+  @media (min-width: 1024px) { .sidebar { display: block; } }
+  .side-block h2 {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--fg-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    margin-bottom: var(--space-3);
+  }
+  .menu-tree {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: var(--space-1);
+  }
+  .menu-tree details summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    color: var(--fg-primary);
+    font-weight: 500;
+    font-size: var(--text-sm);
+  }
+  .menu-tree details summary::-webkit-details-marker { display: none; }
+  .menu-tree details summary:hover { background: var(--bg-elevated); }
+  .menu-tree details summary a {
+    color: inherit;
+    flex: 1;
+  }
+  .menu-tree .count {
+    font-size: var(--text-xs);
+    color: var(--fg-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .sub-list {
+    list-style: none;
+    padding: var(--space-1) 0 var(--space-2);
+    margin: 0;
+    display: grid;
+    gap: 1px;
+  }
+  .sub-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px var(--space-3) 6px var(--space-5);
+    border-left: 2px solid transparent;
+    font-size: var(--text-sm);
+    color: var(--fg-secondary);
+    transition: color var(--duration-fast) var(--ease-out),
+                border-color var(--duration-fast) var(--ease-out);
+  }
+  .sub-list li a { color: inherit; flex: 1; }
+  .sub-list li:hover { color: var(--fg-primary); }
+  .sub-list li.is-active {
+    color: var(--fg-primary);
+    border-left-color: var(--brand-tide);
+    background: color-mix(in srgb, var(--brand-tide) 12%, transparent);
+  }
+  .sub-list li.is-active a { color: var(--fg-primary); font-weight: 500; }
+
+  /* === Content === */
   .toolbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: var(--space-3);
     padding-block: var(--space-3);
-    border-block: 1px solid var(--border-subtle);
-    margin-bottom: var(--space-5);
+    border-bottom: 1px solid var(--border-subtle);
     flex-wrap: wrap;
   }
-  .sort { display: flex; align-items: center; gap: var(--space-3); font-size: var(--text-sm); color: var(--fg-secondary); }
-  .sort select {
-    background: var(--bg-elevated);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-sm);
-    padding: var(--space-2) var(--space-3);
-    color: var(--fg-primary);
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    align-items: center;
   }
-  .meta { color: var(--fg-secondary); font-size: var(--text-sm); }
+  .chip-count {
+    margin-left: var(--space-1);
+    color: var(--fg-muted);
+    font-size: 10px;
+  }
+  .btn-pill[aria-pressed='true'] .chip-count { color: rgba(255,255,255,0.78); }
+  .chip-clear {
+    color: var(--fg-secondary);
+    font-size: var(--text-xs);
+    text-decoration: underline;
+    padding: 4px 8px;
+  }
+  .chip-clear:hover { color: var(--fg-primary); }
+
+  .sort {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--fg-secondary);
+  }
+  .sort .select {
+    width: auto;
+    min-width: 160px;
+    height: var(--control-sm);
+    font-size: var(--text-sm);
+  }
+
+  .result-count {
+    color: var(--fg-secondary);
+    font-size: var(--text-sm);
+    margin: var(--space-3) 0 var(--space-4);
+  }
+  .result-count #resultCount { color: var(--fg-primary); font-weight: 600; }
 
   .empty {
     padding: var(--space-8);

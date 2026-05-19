@@ -1,4 +1,6 @@
 ---
+export const prerender = true;
+
 import Base from '../layouts/Base.astro';
 import ProductCard from '../components/ProductCard.astro';
 import { loadProductMap, loadMenuList, extractBrand, pickThumb, url } from '../lib/data';
@@ -9,40 +11,81 @@ const menus = await loadMenuList();
 const all = Array.from(products.values());
 const onSale = all
   .filter((p) => p.price !== null && p.sale_price !== null && p.sale_price! < p.price!)
-  .slice(0, 12);
-const newArrivals = all.slice(-8).reverse();
+  .slice(0, 10);
+const newArrivals = all.slice(-10).reverse();
+
+const brands = ['DAIWA', 'SHIMANO', 'OWNER', 'gamakatsu', 'HARiMitsu', 'pokee', 'DUEL', 'KIZAKURA'];
+
+// menu_id → 線稿圖示（依資料分類名稱對應）
+function iconFor(menuId: number) {
+  switch (menuId) {
+    case 26: // 路亞/鐵板
+      return '<path d="M6 12c3-4 7-4 10-2l2-2v8l-2-2c-3 2-7 2-10-2Z"/><circle cx="14.5" cy="11" r="0.6" fill="currentColor"/><path d="M6 12c-1 0-2-1-2-2M6 12c-1 0-2 1-2 2"/>';
+    case 27: // 釣竿
+      return '<path d="M3 21 21 3"/><path d="M3 21h4"/><path d="m7 17 1 1"/><path d="m11 13 1 1"/><path d="m15 9 1 1"/>';
+    case 28: // 捲線器
+      return '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 4v3M12 17v3M4 12h3M17 12h3"/>';
+    case 29: // 魚鉤
+      return '<path d="M12 3v9a5 5 0 0 1-10 0"/><circle cx="12" cy="3" r="1.5"/><path d="m5 17 1 2"/>';
+    case 30: // 釣線
+      return '<path d="M4 7c4 0 4 10 8 10s4-10 8-10"/><circle cx="4" cy="7" r="1.2"/><circle cx="20" cy="7" r="1.2"/>';
+    case 31: // 浮標
+      return '<ellipse cx="12" cy="10" rx="4" ry="6"/><path d="M12 16v5"/><path d="M3 20c2-1 5-1 9-1s7 0 9 1"/>';
+    case 32: // 衣著/部品
+      return '<path d="M4 7 9 4l3 3 3-3 5 3-2 4-3-1v10H9V10L6 11Z"/>';
+    case 33: // 零配件
+      return '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/>';
+    case 34: // 餌料
+      return '<path d="M12 3c3 4 5 7 5 10a5 5 0 0 1-10 0c0-3 2-6 5-10Z"/><circle cx="10" cy="12" r="0.7" fill="currentColor"/>';
+    case 35: // 裝備/冰箱
+      return '<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M8 6V4h8v2M3 12h18"/>';
+    case 36: // 所有品牌
+      return '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>';
+    default:
+      return '<circle cx="12" cy="12" r="8"/>';
+  }
+}
 ---
 
 <Base title="紅海釣具店">
   <section class="hero">
     <div class="container hero-inner">
       <div class="hero-copy">
-        <p class="hero-eyebrow">精選釣具 · 多元品項</p>
+        <span class="hero-eyebrow">精選釣具 · 多元品項</span>
         <h1 class="hero-title">
           磯礁、灘岸、深海、釣蝦<br />
-          一站備齊
+          <span class="hero-accent">一站備齊</span>
         </h1>
         <p class="hero-sub">
-          11 大類、{products.size.toLocaleString('zh-Hant')}+ 件商品。SHIMANO、DAIWA、上興、HEXING、pokee … 老店熟客的選擇。
+          11 大類、{products.size.toLocaleString('zh-Hant')}+ 件商品。<br />
+          SHIMANO · DAIWA · OWNER · gamakatsu · HARiMitsu — 老店熟客的選擇。
         </p>
-        <div class="cluster">
-          <a href={url('categories')} class="btn btn-primary">逛全部商品</a>
-          <a href={url('menus/27')} class="btn btn-secondary">釣竿專區</a>
+        <div class="hero-cta">
+          <a href={url('categories')} class="btn btn-primary btn-lg">逛全部商品</a>
+          <a href={url('menus/27')} class="btn btn-secondary btn-lg">釣竿專區 →</a>
         </div>
       </div>
+      <aside class="hero-meta" aria-hidden="true">
+        <div class="meta-row"><span class="dot dot-tide"></span>磯釣 / 船釣</div>
+        <div class="meta-row"><span class="dot dot-ember"></span>限量特價</div>
+        <div class="meta-row"><span class="dot dot-amber"></span>新品到貨</div>
+        <div class="meta-row"><span class="dot dot-kelp"></span>現貨庫存</div>
+      </aside>
     </div>
   </section>
 
   <section class="container section">
     <header class="section-head">
       <h2>11 大類入口</h2>
-      <p>從適合你的釣法或裝備類型開始</p>
+      <p>從你的釣法或裝備類型開始</p>
     </header>
     <ul class="menu-grid">
       {menus.map((m) => (
         <li>
           <a href={url(`menus/${m.menu_id}`)} class="menu-tile">
-            <span class="menu-icon" aria-hidden="true">●</span>
+            <span class="menu-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" set:html={iconFor(m.menu_id)} />
+            </span>
             <span class="menu-name">{m.name}</span>
             <span class="menu-count">{m.subcategories.length} 子分類</span>
           </a>
@@ -54,8 +97,11 @@ const newArrivals = all.slice(-8).reverse();
   {onSale.length > 0 && (
     <section class="container section">
       <header class="section-head">
-        <h2>特價精選</h2>
-        <a href={url('sale')} class="see-all">看全部 →</a>
+        <div>
+          <h2>特價精選</h2>
+          <p>克制使用紅字，這裡是當週實際下殺商品</p>
+        </div>
+        <a href={url('search') + '?q=特價'} class="see-all">看全部 →</a>
       </header>
       <div class="grid-cards">
         {onSale.map((p) => (
@@ -76,7 +122,11 @@ const newArrivals = all.slice(-8).reverse();
   {newArrivals.length > 0 && (
     <section class="container section">
       <header class="section-head">
-        <h2>新品上架</h2>
+        <div>
+          <h2>新品上架</h2>
+          <p>近期入庫的新貨</p>
+        </div>
+        <a href={url('categories')} class="see-all">看全部 →</a>
       </header>
       <div class="grid-cards">
         {newArrivals.map((p) => (
@@ -93,50 +143,122 @@ const newArrivals = all.slice(-8).reverse();
       </div>
     </section>
   )}
+
+  <section class="brand-wall">
+    <div class="container">
+      <header class="section-head">
+        <h2>合作品牌</h2>
+        <p>長期穩定供貨的品牌</p>
+      </header>
+      <ul class="brand-row">
+        {brands.map((b) => (
+          <li><span>{b}</span></li>
+        ))}
+      </ul>
+    </div>
+  </section>
 </Base>
 
 <style>
+  /* === Hero === */
   .hero {
     position: relative;
-    background:
-      radial-gradient(1200px 600px at 80% 20%, rgba(14, 124, 134, 0.18), transparent 60%),
-      linear-gradient(180deg, var(--ink-900) 0%, var(--ink-800) 100%);
-    padding-block: var(--space-9);
+    min-height: clamp(420px, 60vh, 640px);
+    display: flex;
+    align-items: center;
     overflow: hidden;
+    background:
+      radial-gradient(900px 500px at 75% 30%, color-mix(in srgb, var(--brand-tide) 22%, transparent), transparent 60%),
+      radial-gradient(700px 400px at 15% 80%, color-mix(in srgb, var(--ink-700) 70%, transparent), transparent 65%),
+      linear-gradient(165deg, var(--ink-900) 0%, var(--ink-800) 100%);
+    border-bottom: 1px solid var(--border-subtle);
   }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg, transparent 0 39px, color-mix(in srgb, var(--ink-100) 4%, transparent) 39px 40px),
+      repeating-linear-gradient(90deg, transparent 0 39px, color-mix(in srgb, var(--ink-100) 4%, transparent) 39px 40px);
+    mask-image: radial-gradient(ellipse at 60% 40%, #000 30%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse at 60% 40%, #000 30%, transparent 75%);
+    pointer-events: none;
+  }
+
+  .hero-inner {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-7);
+    align-items: center;
+    padding-block: var(--space-8);
+    position: relative;
+  }
+  @media (min-width: 900px) {
+    .hero-inner { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); }
+  }
+
   .hero-eyebrow {
+    display: inline-block;
     color: var(--brand-tide);
     font-size: var(--text-sm);
-    letter-spacing: 0.2em;
+    letter-spacing: 0.28em;
     text-transform: uppercase;
-    margin-bottom: var(--space-3);
+    margin-bottom: var(--space-4);
   }
   .hero-title {
-    font-size: var(--text-display);
-    line-height: 1.15;
-    color: var(--fg-primary);
+    font-size: clamp(2rem, 5.5vw, 3rem);
+    line-height: 1.18;
+    color: var(--ink-100);
+    letter-spacing: -0.01em;
+  }
+  .hero-accent {
+    background: linear-gradient(120deg, var(--ink-100) 0%, var(--brand-tide-soft) 60%, var(--ink-100) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
   .hero-sub {
     margin-block: var(--space-5);
-    color: var(--fg-secondary);
+    color: var(--ink-300);
     max-width: 56ch;
+    line-height: 1.75;
   }
-
-  .section {
-    padding-block: var(--space-7);
-  }
-  .section-head {
+  .hero-cta {
     display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    margin-bottom: var(--space-5);
-    gap: var(--space-4);
     flex-wrap: wrap;
+    gap: var(--space-3);
   }
-  .section-head p { color: var(--fg-secondary); margin: 0; }
-  .see-all { color: var(--fg-secondary); font-size: var(--text-sm); }
-  .see-all:hover { color: var(--brand-tide); }
 
+  .hero-meta {
+    display: none;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-5);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    background: color-mix(in srgb, var(--ink-900) 60%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    font-size: var(--text-sm);
+    color: var(--ink-300);
+  }
+  @media (min-width: 900px) { .hero-meta { display: flex; } }
+  .meta-row { display: flex; align-items: center; gap: var(--space-3); }
+  .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    display: inline-block;
+  }
+  .dot-tide  { background: var(--brand-tide); }
+  .dot-ember { background: var(--accent-ember); }
+  .dot-amber { background: var(--accent-amber); }
+  .dot-kelp  { background: var(--accent-kelp); }
+
+  /* === Sections === */
+  .section {
+    padding-block: var(--space-8);
+  }
+
+  /* === 11 大類 tile grid === */
   .menu-grid {
     list-style: none;
     padding: 0;
@@ -146,33 +268,85 @@ const newArrivals = all.slice(-8).reverse();
     gap: var(--space-3);
   }
   @media (min-width: 480px) { .menu-grid { grid-template-columns: repeat(3, 1fr); } }
-  @media (min-width: 768px) { .menu-grid { grid-template-columns: repeat(4, 1fr); } }
+  @media (min-width: 768px) { .menu-grid { grid-template-columns: repeat(4, 1fr); gap: var(--space-4); } }
   @media (min-width: 1024px) { .menu-grid { grid-template-columns: repeat(6, 1fr); } }
 
   .menu-tile {
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: var(--space-2);
     background: var(--bg-elevated);
-    padding: var(--space-4);
+    padding: var(--space-5) var(--space-3);
     border-radius: var(--radius-lg);
     color: var(--fg-primary);
     border: 1px solid transparent;
+    text-align: center;
     transition: border-color var(--duration-base) var(--ease-out),
-                transform var(--duration-base) var(--ease-out);
+                transform var(--duration-base) var(--ease-out),
+                background var(--duration-base) var(--ease-out);
   }
   .menu-tile:hover {
     border-color: var(--brand-tide);
     transform: translateY(-2px);
     color: var(--fg-primary);
+    background: var(--bg-elevated-hover);
   }
   .menu-icon {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--brand-tide) 18%, transparent);
     color: var(--brand-tide);
-    font-size: var(--text-xl);
+    margin-bottom: var(--space-1);
   }
-  .menu-name { font-weight: 600; }
+  .menu-tile:hover .menu-icon {
+    background: var(--brand-tide);
+    color: #fff;
+  }
+  .menu-name {
+    font-weight: 600;
+    font-size: var(--text-base);
+  }
   .menu-count {
     font-size: var(--text-xs);
+    color: var(--fg-muted);
+  }
+
+  /* === Brand wall === */
+  .brand-wall {
+    margin-top: var(--space-7);
+    padding-block: var(--space-7);
+    border-block: 1px solid var(--border-subtle);
+    background: var(--bg-elevated);
+  }
+  .brand-row {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+  }
+  @media (min-width: 600px) { .brand-row { grid-template-columns: repeat(4, 1fr); } }
+  @media (min-width: 900px) { .brand-row { grid-template-columns: repeat(8, 1fr); } }
+  .brand-row li {
+    height: 64px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
     color: var(--fg-secondary);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    font-size: var(--text-sm);
+    transition: color var(--duration-base) var(--ease-out),
+                border-color var(--duration-base) var(--ease-out);
+  }
+  .brand-row li:hover {
+    color: var(--fg-primary);
+    border-color: var(--fg-secondary);
   }
 </style>

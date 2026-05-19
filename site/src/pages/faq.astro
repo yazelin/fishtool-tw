@@ -1,5 +1,8 @@
 ---
+export const prerender = true;
+
 import Base from '../layouts/Base.astro';
+import { url } from '../lib/data';
 
 // 等爬蟲 functional_pages.faq 抓回後，把實際 FAQ 內容填到這裡
 const faqs = [
@@ -12,18 +15,25 @@ const faqs = [
 ---
 
 <Base title="常見問題 FAQ">
-  <div class="container">
+  <div class="container narrow">
     <header class="head">
       <h1>常見問題</h1>
-      <p>沒看到答案？歡迎到「客服詢問」頁留言。</p>
+      <p>沒看到答案？歡迎到 <a href={url('inquiry')}>客服詢問</a> 留言。</p>
     </header>
 
     <ul class="faq">
       {faqs.map((item) => (
         <li>
           <details>
-            <summary>{item.q}</summary>
-            <p>{item.a}</p>
+            <summary>
+              <span class="q">{item.q}</span>
+              <span class="indicator" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 9l6 6 6-6"/>
+                </svg>
+              </span>
+            </summary>
+            <div class="a"><p>{item.a}</p></div>
           </details>
         </li>
       ))}
@@ -32,34 +42,52 @@ const faqs = [
 </Base>
 
 <style>
+  .narrow { max-width: 720px; }
   .head { margin-block: var(--space-5) var(--space-6); }
-  .head p { color: var(--fg-secondary); margin-top: var(--space-2); }
+  .head p { color: var(--fg-secondary); margin-top: var(--space-2); font-size: var(--text-sm); }
+  .head a { color: var(--brand-tide); text-decoration: underline; text-underline-offset: 3px; }
 
-  .faq { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--space-3); max-width: var(--article-max); }
+  .faq {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: var(--space-3);
+  }
   .faq li {
     background: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
     overflow: hidden;
+    transition: border-color var(--duration-fast) var(--ease-out);
   }
+  .faq li:hover { border-color: var(--fg-secondary); }
   details summary {
-    padding: var(--space-4);
-    cursor: pointer;
-    font-weight: 600;
     list-style: none;
+    padding: var(--space-4) var(--space-5);
+    cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: var(--space-4);
   }
-  details summary::after {
-    content: '+';
-    font-size: var(--text-xl);
+  details summary::-webkit-details-marker { display: none; }
+  details summary .q {
+    font-weight: 600;
+    font-size: var(--text-base);
+  }
+  .indicator {
     color: var(--fg-secondary);
     transition: transform var(--duration-base) var(--ease-out);
+    display: inline-grid;
+    place-items: center;
   }
-  details[open] summary::after { content: '−'; }
-  details p {
-    padding: 0 var(--space-4) var(--space-4);
+  details[open] .indicator { transform: rotate(180deg); }
+  details .a {
+    padding: 0 var(--space-5) var(--space-5);
     color: var(--fg-secondary);
-    line-height: 1.8;
+    line-height: 1.85;
+    border-top: 1px solid var(--border-subtle);
+    padding-top: var(--space-4);
   }
 </style>

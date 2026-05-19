@@ -1,20 +1,15 @@
 ---
-import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import ProductCard from '../../components/ProductCard.astro';
 import { loadProductMap, extractBrand, pickThumb, formatPrice } from '../../lib/data';
 
-export async function getStaticPaths() {
-  const entries = await getCollection('products');
-  return entries.map((e) => ({
-    params: { pid: String(e.data.pid) },
-    props: { product: e.data },
-  }));
-}
-
-const { product } = Astro.props;
+// SSR：商品數量太多（>20K），改成每次請求即時 render，避免 build 兩萬頁
+const pid = Number(Astro.params.pid);
+if (!Number.isFinite(pid)) return Astro.redirect('/404');
 const all = await loadProductMap();
+const product = all.get(pid);
+if (!product) return new Response('Product not found', { status: 404 });
 
 const brand = extractBrand(product.name);
 const hasSale =
@@ -29,10 +24,12 @@ const related = product.related_pids
   .slice(0, 6);
 
 const heroImage = product.detail_images[0] ?? product.thumb_images[0] ?? null;
-const gallery = [
-  ...(product.detail_images ?? []),
-  ...(product.thumb_images ?? []),
-].filter(Boolean);
+const gallery = Array.from(
+  new Set([
+    ...(product.detail_images ?? []),
+    ...(product.thumb_images ?? []),
+  ].filter(Boolean) as string[]),
+);
 ---
 
 <Base title={product.name ?? `商品 ${product.pid}`}>
@@ -43,48 +40,67 @@ const gallery = [
       <section class="gallery">
         <div class="hero-img">
           {heroImage ? (
-            <img src={heroImage} alt={product.name ?? ''} />
+            <img id="heroImg" src={heroImage} alt={product.name ?? ''} />
           ) : (
             <div class="empty-img" aria-hidden="true">無圖</div>
           )}
+          {hasSale && <span class="badge badge-sale gallery-ribbon">特價</span>}
         </div>
         {gallery.length > 1 && (
-          <div class="thumbs">
-            {gallery.slice(0, 6).map((src) => (
-              <img src={src} alt="" loading="lazy" />
+          <div class="thumbs" id="thumbStrip">
+            {gallery.slice(0, 8).map((src, i) => (
+              <button type="button" class={`thumb-btn${i === 0 ? ' is-active' : ''}`} data-src={src} aria-label={`縮圖 ${i + 1}`}>
+                <img src={src} alt="" loading="lazy" />
+              </button>
             ))}
           </div>
         )}
       </section>
 
       <aside class="info">
-        <div class="meta">
-          {brand && <span class="badge badge-brand">{brand}</span>}
-          {product.sku && <span class="sku">編號 {product.sku}</span>}
-        </div>
-        <h1>{product.name}</h1>
+        <div class="info-top">
+          <div class="meta">
+            {brand && <span class="badge badge-brand">{brand}</span>}
+            {product.sku && <span class="sku">編號 {product.sku}</span>}
+          </div>
+          <h1>{product.name}</h1>
 
-        <div class="price-block">
-          {hasSale ? (
-            <>
-              <span class="sale">{formatPrice(product.sale_price)}</span>
-              <span class="orig">原價 {formatPrice(product.price)}</span>
-              <span class="badge badge-sale">特價</span>
-            </>
-          ) : (
-            <span class="sale">{formatPrice(product.sale_price ?? product.price)}</span>
-          )}
-        </div>
+          <div class="price-block">
+            {hasSale ? (
+              <>
+                <span class="sale">{formatPrice(product.sale_price)}</span>
+                <span class="orig">原價 {formatPrice(product.price)}</span>
+                <span class="badge badge-sale">特價</span>
+              </>
+            ) : (
+              <span class="sale">{formatPrice(product.sale_price ?? product.price)}</span>
+            )}
+          </div>
 
-        <div class="actions">
-          <button class="btn btn-primary" disabled>加入購物車</button>
-          <button class="btn btn-secondary" disabled>收藏</button>
+          <div class="actions">
+            <button class="btn btn-primary btn-lg" disabled aria-disabled="true">加入購物車</button>
+            <button class="btn btn-secondary btn-lg" disabled aria-disabled="true" aria-label="加入收藏">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M19 14c1.5-1.5 3-3.3 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.7 0-3 .8-4.5 2-1.5-1.2-2.8-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.2 1.5 4 3 5.5l7 7Z"/>
+              </svg>
+              收藏
+            </button>
+          </div>
         </div>
 
         <ul class="trust">
-          <li>滿千免運（依原站政策）</li>
-          <li>客服 10:00–21:00 在線</li>
-          <li>實體門市可取貨</li>
+          <li>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            滿千免運（依原站政策）
+          </li>
+          <li>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            客服 10:00 – 21:00 在線
+          </li>
+          <li>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-6 9 6v11H3z"/><path d="M9 20V12h6v8"/></svg>
+            實體門市可取貨
+          </li>
         </ul>
       </aside>
     </div>
@@ -115,6 +131,32 @@ const gallery = [
       </section>
     )}
   </div>
+
+  {/* 手機版 sticky 加入購物車條 */}
+  <div class="sticky-bar" role="region" aria-label="商品操作">
+    <div class="sticky-price">
+      <span class="now">{formatPrice(product.sale_price ?? product.price)}</span>
+      {hasSale && <span class="was">原 {formatPrice(product.price)}</span>}
+    </div>
+    <button class="btn btn-primary" disabled aria-disabled="true">加入購物車</button>
+  </div>
+
+  <script is:inline>
+    (() => {
+      const strip = document.getElementById('thumbStrip');
+      const hero = document.getElementById('heroImg');
+      if (!strip || !hero) return;
+      strip.addEventListener('click', (e) => {
+        const btn = e.target.closest('.thumb-btn');
+        if (!btn) return;
+        const src = btn.dataset.src;
+        if (!src) return;
+        hero.src = src;
+        strip.querySelectorAll('.thumb-btn').forEach((b) => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+      });
+    })();
+  </script>
 </Base>
 
 <style>
@@ -124,8 +166,10 @@ const gallery = [
     gap: var(--space-6);
     margin-block: var(--space-5) var(--space-7);
   }
-  @media (min-width: 900px) { .detail { grid-template-columns: 6fr 4fr; } }
+  @media (min-width: 900px) { .detail { grid-template-columns: 6fr 4fr; gap: var(--space-7); } }
 
+  /* === Gallery === */
+  .gallery { display: flex; flex-direction: column; gap: var(--space-3); }
   .hero-img {
     aspect-ratio: 1;
     background: var(--bg-elevated);
@@ -133,49 +177,68 @@ const gallery = [
     display: grid;
     place-items: center;
     overflow: hidden;
+    position: relative;
   }
-  .hero-img img { width: 100%; height: 100%; object-fit: contain; }
+  .hero-img img { width: 100%; height: 100%; object-fit: contain; padding: var(--space-4); }
   .empty-img { color: var(--fg-muted); }
+  .gallery-ribbon { position: absolute; top: var(--space-3); left: var(--space-3); }
 
   .thumbs {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(8, 1fr);
     gap: var(--space-2);
-    margin-top: var(--space-3);
   }
-  .thumbs img {
+  @media (max-width: 600px) { .thumbs { grid-template-columns: repeat(5, 1fr); } }
+  .thumb-btn {
     aspect-ratio: 1;
-    object-fit: contain;
+    padding: 0;
     background: var(--bg-elevated);
+    border: 1px solid transparent;
     border-radius: var(--radius-sm);
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color var(--duration-fast) var(--ease-out);
   }
+  .thumb-btn img { width: 100%; height: 100%; object-fit: contain; }
+  .thumb-btn:hover { border-color: var(--fg-secondary); }
+  .thumb-btn.is-active { border-color: var(--brand-tide); }
 
-  .info { display: flex; flex-direction: column; gap: var(--space-4); }
+  /* === Info === */
+  .info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+  .info-top { display: flex; flex-direction: column; gap: var(--space-4); }
   .meta {
     display: flex;
     align-items: center;
     gap: var(--space-3);
     color: var(--fg-secondary);
     font-size: var(--text-sm);
+    flex-wrap: wrap;
   }
-  .sku { font-family: var(--font-mono); }
+  .sku { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-muted); }
 
   .info h1 {
     font-size: var(--text-2xl);
     line-height: 1.3;
+    margin: 0;
   }
 
   .price-block {
     display: flex;
     align-items: baseline;
+    flex-wrap: wrap;
     gap: var(--space-3);
-    padding-block: var(--space-3);
+    padding-block: var(--space-4);
     border-block: 1px solid var(--border-subtle);
   }
   .price-block .sale {
     font-size: var(--text-3xl);
     font-weight: 700;
     color: var(--accent-ember);
+    letter-spacing: -0.01em;
   }
   .price-block .orig {
     color: var(--fg-muted);
@@ -184,7 +247,7 @@ const gallery = [
   }
 
   .actions { display: flex; gap: var(--space-3); flex-wrap: wrap; }
-  .actions .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  .actions .btn { flex: 1; }
 
   .trust {
     list-style: none;
@@ -193,13 +256,19 @@ const gallery = [
     background: var(--bg-elevated);
     border-radius: var(--radius-md);
     display: grid;
-    gap: var(--space-2);
+    gap: var(--space-3);
     font-size: var(--text-sm);
     color: var(--fg-secondary);
   }
+  .trust li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+  .trust svg { color: var(--brand-tide); flex-shrink: 0; }
 
   .description, .related {
-    margin-block: var(--space-7);
+    margin-block: var(--space-8);
   }
   .description h2, .related h2 {
     font-size: var(--text-xl);
@@ -208,6 +277,43 @@ const gallery = [
   .description p {
     max-width: var(--article-max);
     white-space: pre-wrap;
-    line-height: 1.8;
+    line-height: 1.85;
+    color: var(--fg-primary);
+  }
+
+  /* === Sticky 手機底部 CTA === */
+  .sticky-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: none;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    background: color-mix(in srgb, var(--bg-base) 92%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border-subtle);
+    z-index: 40;
+  }
+  .sticky-bar .btn { flex: 1; }
+  .sticky-price { display: flex; flex-direction: column; line-height: 1.1; }
+  .sticky-price .now {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--accent-ember);
+  }
+  .sticky-price .was {
+    font-size: var(--text-xs);
+    color: var(--fg-muted);
+    text-decoration: line-through;
+    margin-top: 2px;
+  }
+
+  @media (max-width: 768px) {
+    .sticky-bar { display: flex; }
+    main { padding-bottom: 76px; }
+    .actions { display: none; }
   }
 </style>

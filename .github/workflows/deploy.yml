@@ -1,12 +1,10 @@
-name: Deploy to GitHub Pages
+name: Deploy to GitHub Pages (legacy fallback)
 
+# 注意：主要部署已改用 Vercel SSR；此 workflow 已停用自動觸發。
+# 若想暫時回退到 GitHub Pages 純靜態版，需手動先在 astro.config.mjs
+# 切回 output: 'static'，再到 Actions 頁面手動觸發此工作流。
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
-  schedule:
-    # 每天凌晨 04:00 UTC（台北 12:00）重建一次，配合未來的定時 DB → JSON pipeline
-    - cron: '0 4 * * *'
 
 permissions:
   contents: read

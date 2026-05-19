@@ -1,6 +1,7 @@
 ---
+export const prerender = true;
+
 import Base from '../layouts/Base.astro';
-import ProductCard from '../components/ProductCard.astro';
 import { loadProductMap, extractBrand, pickThumb } from '../lib/data';
 
 // 純 client side 過濾的搜尋頁；之後可換成 build-time 預先索引或 Pagefind
@@ -22,13 +23,24 @@ const dataset = all.map((p) => ({
   <div class="container">
     <header class="head">
       <h1>搜尋商品</h1>
-      <form class="search-form" method="get">
-        <input type="search" name="q" id="q" placeholder="輸入關鍵字、編號、品牌…" autocomplete="off" />
+      <form class="search-form" method="get" role="search">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.3-4.3"></path>
+        </svg>
+        <input type="search" name="q" id="q" placeholder="輸入關鍵字、編號、品牌…" autocomplete="off" aria-label="搜尋關鍵字" />
+        <button type="button" id="clearBtn" class="clear-btn" aria-label="清除" hidden>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
       </form>
       <p id="status" class="status">輸入關鍵字後即時顯示符合的商品。</p>
     </header>
 
-    <div id="results" class="grid-cards"></div>
+    <div id="results" class="grid-cards" aria-live="polite"></div>
+    <div id="emptyState" class="empty-state" hidden>
+      <p class="empty-title">找不到符合的商品</p>
+      <p class="empty-sub">試試別的關鍵字、品牌名或商品編號。</p>
+    </div>
   </div>
 
   <script type="application/json" id="dataset" set:html={JSON.stringify(dataset)} />
@@ -49,6 +61,8 @@ const dataset = all.map((p) => ({
     const input = document.getElementById('q');
     const results = document.getElementById('results');
     const status = document.getElementById('status');
+    const empty = document.getElementById('emptyState');
+    const clearBtn = document.getElementById('clearBtn');
     const initial = params.get('q') ?? '';
     input.value = initial;
 
@@ -57,12 +71,20 @@ const dataset = all.map((p) => ({
     function render(q) {
       const term = q.trim().toLowerCase();
       results.innerHTML = '';
+      clearBtn.hidden = !q.length;
       if (!term) {
         status.textContent = '輸入關鍵字後即時顯示符合的商品。';
+        empty.hidden = true;
         return;
       }
       const matched = data.filter((d) => d.q.includes(term)).slice(0, 200);
-      status.textContent = `符合 ${matched.length.toLocaleString('zh-Hant')} 件（最多顯示 200）`;
+      if (matched.length === 0) {
+        status.textContent = '';
+        empty.hidden = false;
+        return;
+      }
+      empty.hidden = true;
+      status.innerHTML = `符合 <strong>${matched.length.toLocaleString('zh-Hant')}</strong> 件（最多顯示 200）`;
       const tpl = document.getElementById('card-template').content;
       const frag = document.createDocumentFragment();
       for (const p of matched) {
@@ -71,13 +93,13 @@ const dataset = all.map((p) => ({
         link.href = `products/${p.pid}`;
         link.className = 'card';
         const img = node.querySelector('img');
-        if (p.thumb) img.src = p.thumb;
+        if (p.thumb) { img.src = p.thumb; img.alt = p.name ?? ''; }
         node.querySelector('.brand').textContent = p.brand ?? '';
         node.querySelector('.sku').textContent = p.sku ?? '';
         node.querySelector('.name').textContent = p.name ?? '';
         const hasSale = p.price != null && p.sale_price != null && p.sale_price < p.price;
         node.querySelector('.price').innerHTML = hasSale
-          ? `<span class="sale">${fmt(p.sale_price)}</span><span class="orig">${fmt(p.price)}</span>`
+          ? `<span class="sale">${fmt(p.sale_price)}</span><span class="orig"><span class="orig-label">原</span> ${fmt(p.price)}</span>`
           : `<span class="sale">${fmt(p.sale_price ?? p.price)}</span>`;
         frag.appendChild(node);
       }
@@ -89,8 +111,16 @@ const dataset = all.map((p) => ({
       clearTimeout(timer);
       timer = setTimeout(() => render(input.value), 120);
       const params = new URLSearchParams(location.search);
-      params.set('q', input.value);
-      history.replaceState(null, '', '?' + params.toString());
+      if (input.value) params.set('q', input.value); else params.delete('q');
+      const qs = params.toString();
+      history.replaceState(null, '', qs ? '?' + qs : location.pathname);
+    });
+
+    clearBtn.addEventListener('click', () => {
+      input.value = '';
+      input.focus();
+      render('');
+      history.replaceState(null, '', location.pathname);
     });
 
     render(initial);
@@ -98,20 +128,62 @@ const dataset = all.map((p) => ({
 </Base>
 
 <style>
-  .head { margin-block: var(--space-5) var(--space-6); }
+  .head { margin-block: var(--space-5) var(--space-6); max-width: 720px; }
+  .head h1 { margin-bottom: var(--space-4); }
+  .search-form {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .search-icon {
+    position: absolute;
+    left: var(--space-5);
+    color: var(--fg-muted);
+    pointer-events: none;
+  }
   .search-form input {
     width: 100%;
-    height: 48px;
-    padding-inline: var(--space-4);
+    height: 56px;
+    padding: 0 var(--space-7) 0 calc(var(--space-5) + 26px);
     border-radius: var(--radius-pill);
     background: var(--bg-elevated);
     border: 1px solid var(--border-subtle);
     color: var(--fg-primary);
     font-size: var(--text-lg);
+    transition: border-color var(--duration-fast) var(--ease-out);
   }
-  .status { margin-top: var(--space-3); color: var(--fg-secondary); font-size: var(--text-sm); }
+  .search-form input::placeholder { color: var(--fg-muted); }
+  .search-form input:focus {
+    border-color: var(--brand-tide);
+    outline: 2px solid var(--brand-tide);
+    outline-offset: 0;
+  }
+  .clear-btn {
+    position: absolute;
+    right: var(--space-3);
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    color: var(--fg-secondary);
+  }
+  .clear-btn:hover { background: var(--bg-elevated-hover); color: var(--fg-primary); }
 
-  /* 搜尋結果卡片樣式（簡化版） */
+  .status { margin-top: var(--space-3); color: var(--fg-secondary); font-size: var(--text-sm); }
+  .status strong { color: var(--fg-primary); font-weight: 600; }
+
+  .empty-state {
+    padding: var(--space-9) var(--space-5);
+    text-align: center;
+    background: var(--bg-elevated);
+    border: 1px dashed var(--border-subtle);
+    border-radius: var(--radius-md);
+  }
+  .empty-title { font-size: var(--text-lg); font-weight: 600; color: var(--fg-primary); }
+  .empty-sub { font-size: var(--text-sm); color: var(--fg-secondary); margin-top: var(--space-2); }
+
+  /* 搜尋結果卡片樣式（與 ProductCard 對齊） */
   :global(#results .card) {
     display: flex;
     flex-direction: column;
@@ -120,18 +192,39 @@ const dataset = all.map((p) => ({
     overflow: hidden;
     color: inherit;
     text-decoration: none;
+    transition: transform var(--duration-base) var(--ease-out),
+                box-shadow var(--duration-base) var(--ease-out);
   }
+  :global(#results .card:hover) { transform: translateY(-2px); box-shadow: var(--shadow-md); }
   :global(#results .thumb) {
     aspect-ratio: 1;
     background: var(--ink-800);
     display: grid;
     place-items: center;
+    overflow: hidden;
   }
-  :global(#results .thumb img) { width: 100%; height: 100%; object-fit: contain; }
+  :global(#results .thumb img) { width: 100%; height: 100%; object-fit: contain; transition: transform var(--duration-slow) var(--ease-out); }
+  :global(#results .card:hover .thumb img) { transform: scale(1.03); }
   :global(#results .body) { padding: var(--space-3); display: grid; gap: var(--space-2); }
   :global(#results .meta) { display: flex; justify-content: space-between; font-size: var(--text-xs); color: var(--fg-secondary); }
-  :global(#results .name) { font-size: var(--text-base); line-height: 1.3; min-height: 2.6em; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  :global(#results .price) { display: flex; gap: var(--space-2); align-items: baseline; }
-  :global(#results .price .sale) { font-size: var(--text-lg); font-weight: 700; color: var(--accent-ember); }
+  :global(#results .meta .brand) { font-weight: 600; letter-spacing: 0.04em; }
+  :global(#results .meta .sku) { color: var(--fg-muted); }
+  :global(#results .name) {
+    font-size: var(--text-lg);
+    font-weight: 500;
+    line-height: 1.3;
+    min-height: 2.6em;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  :global(#results .price) { display: flex; gap: var(--space-2); align-items: baseline; flex-wrap: wrap; }
+  :global(#results .price .sale) { font-size: var(--text-xl); font-weight: 700; color: var(--accent-ember); }
   :global(#results .price .orig) { font-size: var(--text-sm); color: var(--fg-muted); text-decoration: line-through; }
+  :global(#results .price .orig-label) { font-size: 11px; margin-right: 2px; text-decoration: none; display: inline-block; }
+  @media (max-width: 600px) {
+    :global(#results .name) { font-size: var(--text-base); }
+    :global(#results .price .sale) { font-size: var(--text-lg); }
+  }
 </style>

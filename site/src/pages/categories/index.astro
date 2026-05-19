@@ -1,4 +1,6 @@
 ---
+export const prerender = true;
+
 import Base from '../../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 import { loadMenuList, url } from '../../lib/data';
@@ -20,20 +22,25 @@ const groups = menus
 
 <Base title="全部商品分類">
   <div class="container">
-    <header class="head">
+    <header class="page-head">
       <h1>全部分類</h1>
-      <p>共 {cats.length} 個分類、{cats.reduce((s, c) => s + (c.total_count ?? 0), 0).toLocaleString('zh-Hant')} 件商品</p>
+      <p><strong>{cats.length}</strong> 個子分類 · 共 <strong>{cats.reduce((s, c) => s + (c.total_count ?? 0), 0).toLocaleString('zh-Hant')}</strong> 件商品</p>
     </header>
 
     <section class="by-menu">
       {groups.map(({ menu, subs }) => (
         <div class="menu-block">
-          <h2><a href={url(`menus/${menu.menu_id}`)}>{menu.name}</a></h2>
+          <header class="menu-head">
+            <h2><a href={url(`menus/${menu.menu_id}`)}>{menu.name}</a></h2>
+            <span class="menu-sub-count">{subs.length} 個子分類</span>
+          </header>
           <ul>
             {subs.map((c) => (
               <li>
-                <a href={url(`categories/${c.sid}`)}>{c.name}</a>
-                <span class="count">{c.total_count}</span>
+                <a href={url(`categories/${c.sid}`)}>
+                  <span class="name">{c.name}</span>
+                  <span class="count">{c.total_count}</span>
+                </a>
               </li>
             ))}
           </ul>
@@ -44,33 +51,46 @@ const groups = menus
 </Base>
 
 <style>
-  .head { margin-block: var(--space-5) var(--space-6); }
-  .head p { color: var(--fg-secondary); margin-top: var(--space-2); }
+  .page-head { margin-block: var(--space-5) var(--space-7); }
+  .page-head h1 { font-size: var(--text-3xl); }
+  .page-head p { color: var(--fg-secondary); margin-top: var(--space-2); font-size: var(--text-sm); }
+  .page-head strong { color: var(--fg-primary); font-weight: 600; }
 
-  .by-menu { display: grid; gap: var(--space-7); }
-  .menu-block h2 {
-    font-size: var(--text-xl);
-    margin-bottom: var(--space-3);
+  .by-menu { display: grid; gap: var(--space-8); padding-bottom: var(--space-7); }
+  .menu-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--border-subtle);
+    gap: var(--space-3);
   }
+  .menu-block h2 { font-size: var(--text-xl); }
   .menu-block h2 a { color: var(--fg-primary); }
   .menu-block h2 a:hover { color: var(--brand-tide); }
+  .menu-sub-count { font-size: var(--text-xs); color: var(--fg-muted); }
+
   .menu-block ul {
     list-style: none;
     padding: 0;
     margin: 0;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: var(--space-2) var(--space-4);
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: var(--space-2);
   }
-  .menu-block li {
+  .menu-block li a {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: var(--space-2) var(--space-3);
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
     border-radius: var(--radius-sm);
     background: var(--bg-elevated);
+    color: var(--fg-primary);
+    transition: background var(--duration-fast) var(--ease-out);
   }
-  .menu-block li:hover { background: var(--bg-elevated-hover); }
-  .menu-block li a { color: var(--fg-primary); }
-  .count { color: var(--fg-secondary); font-size: var(--text-xs); }
+  .menu-block li a:hover { background: var(--bg-elevated-hover); }
+  .menu-block .name { font-size: var(--text-sm); }
+  .count { color: var(--fg-muted); font-size: var(--text-xs); font-variant-numeric: tabular-nums; }
 </style>

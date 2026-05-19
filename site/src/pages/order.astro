@@ -1,48 +1,52 @@
 ---
+export const prerender = true;
+
 import Base from '../layouts/Base.astro';
 ---
 
 <Base title="訂單查詢">
-  <div class="container">
+  <div class="container narrow">
     <header class="head">
       <h1>訂單查詢</h1>
-      <p>輸入訂單編號與訂購時填寫的 Email 或手機末四碼。</p>
+      <p>輸入訂單編號，加上訂購時的 Email 或手機末四碼。</p>
     </header>
 
     <form class="form" onsubmit="return false">
-      <label>
-        訂單編號
-        <input type="text" name="order_id" required />
-      </label>
-      <label>
-        Email 或手機末四碼
-        <input type="text" name="contact" required />
-      </label>
-      <button type="submit" class="btn btn-primary" disabled>查詢（後端尚未實作）</button>
+      <div class="field">
+        <label class="field-label" for="order_id">
+          訂單編號 <span class="field-required" aria-hidden="true">*</span>
+        </label>
+        <input id="order_id" class="input" type="text" name="order_id" required aria-required="true" placeholder="例如 20260518-00123" />
+        <span class="field-hint">訂單成立後寄出的 Email 中可找到。</span>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="contact">
+          Email 或手機末四碼 <span class="field-required" aria-hidden="true">*</span>
+        </label>
+        <input id="contact" class="input" type="text" name="contact" required aria-required="true" placeholder="如 service@example.com 或 1234" />
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="btn btn-primary btn-lg" disabled aria-disabled="true">查詢（後端尚未實作）</button>
+      </div>
     </form>
   </div>
 </Base>
 
 <style>
+  .narrow { max-width: 560px; }
   .head { margin-block: var(--space-5) var(--space-6); }
-  .head p { color: var(--fg-secondary); margin-top: var(--space-2); }
+  .head p { color: var(--fg-secondary); margin-top: var(--space-2); font-size: var(--text-sm); }
 
   .form {
     display: grid;
-    gap: var(--space-4);
-    max-width: 480px;
+    gap: var(--space-5);
     background: var(--bg-elevated);
     padding: var(--space-6);
     border-radius: var(--radius-md);
-  }
-  .form label { display: grid; gap: var(--space-2); font-size: var(--text-sm); color: var(--fg-secondary); }
-  .form input {
-    padding: var(--space-3);
-    border-radius: var(--radius-sm);
-    background: var(--bg-base);
     border: 1px solid var(--border-subtle);
-    color: var(--fg-primary);
   }
-  .form input:focus { border-color: var(--brand-tide); }
-  .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  .actions { margin-top: var(--space-2); }
+  .actions .btn { width: 100%; }
 </style>
