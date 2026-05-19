@@ -43,7 +43,7 @@ const Wrapper = href ? 'a' : 'span';
   {variant !== 'mark' && (
     <span class="wordmark">
       <span class="cn">紅海釣具</span>
-      <span class="en">RED&nbsp;SEA&nbsp;TACKLE</span>
+      <span class="en">FishTool.tw</span>
     </span>
   )}
 </Wrapper>
@@ -86,24 +86,25 @@ const Wrapper = href ? 'a' : 'span';
   }
   .en {
     font-weight: 600;
-    letter-spacing: 0.22em;
+    letter-spacing: 0.04em;
     color: var(--ink-500);
     margin-top: 4px;
+    font-style: italic;
   }
   .tone-dark .en { color: rgba(255, 255, 255, 0.55); }
 
   /* 尺寸 */
   .size-sm .cn { font-size: 14px; }
-  .size-sm .en { font-size: 8px; letter-spacing: 0.18em; margin-top: 2px; }
+  .size-sm .en { font-size: 10px; margin-top: 2px; }
 
   .size-md .cn { font-size: 18px; }
-  .size-md .en { font-size: 9.5px; }
+  .size-md .en { font-size: 11.5px; }
 
   .size-lg .cn { font-size: 22px; }
-  .size-lg .en { font-size: 10.5px; }
+  .size-lg .en { font-size: 13px; }
 
   .size-xl .cn { font-size: 32px; }
-  .size-xl .en { font-size: 12px; letter-spacing: 0.28em; margin-top: 6px; }
+  .size-xl .en { font-size: 16px; margin-top: 6px; }
 
   /* hover 時整體不變色（保留識別） */
   a.brand:hover { color: inherit; opacity: 0.9; }

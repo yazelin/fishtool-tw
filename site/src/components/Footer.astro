@@ -7,7 +7,7 @@ import { url } from '../lib/data';
     <section class="brand-block">
       <div class="footer-brand">
         <span class="brand-cn">紅海釣具</span>
-        <span class="brand-en">RED&nbsp;SEA&nbsp;TACKLE</span>
+        <span class="brand-en">FishTool.tw</span>
       </div>
       <p class="brand-desc">磯釣、灘釣、船釣、釣蝦、路亞——多元釣具一站精選。<br />實體門市與線上同步出貨。</p>
     </section>
@@ -48,7 +48,7 @@ import { url } from '../lib/data';
   </div>
 
   <div class="footer-bottom container">
-    <small>© {new Date().getFullYear()} 紅海釣具 RED SEA TACKLE</small>
+    <small>© {new Date().getFullYear()} 紅海釣具 · FishTool.tw</small>
     <small class="legal">
       <a href={url('privacy')}>隱私權</a>
       <span aria-hidden="true">·</span>
@@ -90,10 +90,11 @@ import { url } from '../lib/data';
   }
   .footer-brand .brand-cn { font-size: var(--text-xl); font-weight: 700; }
   .footer-brand .brand-en {
-    font-size: 11px;
-    letter-spacing: 0.22em;
+    font-size: 13px;
+    letter-spacing: 0.04em;
     color: var(--ink-500);
     margin-top: 4px;
+    font-style: italic;
   }
   .brand-desc { font-size: var(--text-sm); line-height: 1.7; }
 
