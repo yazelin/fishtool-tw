@@ -39,7 +39,11 @@ try {
 
     <nav class="quick-nav" aria-label="快速功能">
       <a href={url('order')} class="quick-link">訂單查詢</a>
-      <a href={url('inquiry')} class="quick-link">客服</a>
+      <a href={url('faq')} class="quick-link">購物需知</a>
+      <a href="https://line.me/ti/p/~fishtool2012" target="_blank" rel="noopener" class="quick-link line-link" aria-label="加 LINE 好友 fishtool2012">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.4 10.8c0-3.4-3.4-6.2-7.5-6.2s-7.5 2.8-7.5 6.2c0 3 2.7 5.6 6.3 6.1.2.1.6.2.7.4.1.2 0 .5 0 .7 0 0-.1.5-.1.7-.1.2-.2.7.7.4.9-.3 4.7-2.8 6.5-4.8 1.2-1.4 1.9-2.8 1.9-3.5Z"/></svg>
+        LINE
+      </a>
       <button class="icon-btn theme-toggle" aria-label="切換亮暗" id="theme-toggle">
         <svg class="i-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"></path>
@@ -84,7 +88,8 @@ try {
       <div class="mobile-quick">
         <a href={url('order')}>訂單查詢</a>
         <a href={url('inquiry')}>客服詢問</a>
-        <a href={url('faq')}>常見問題</a>
+        <a href={url('faq')}>購物需知</a>
+        <a href="https://line.me/ti/p/~fishtool2012" target="_blank" rel="noopener" class="line-mobile">LINE: fishtool2012</a>
       </div>
     </div>
   )}
@@ -209,8 +214,16 @@ try {
   .quick-link {
     color: var(--fg-secondary);
     padding: var(--space-2) var(--space-2);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
   }
   .quick-link:hover { color: var(--fg-primary); }
+  .line-link {
+    color: #06C755;
+    font-weight: 600;
+  }
+  .line-link:hover { color: #04a544; }
 
   .icon-btn {
     display: grid;
@@ -300,6 +313,7 @@ try {
     font-size: var(--text-sm);
   }
   .mobile-quick a { color: var(--fg-secondary); }
+  .mobile-quick .line-mobile { color: #06C755; font-weight: 600; }
 
   @media (max-width: 767px) {
     .hamburger { display: grid; }

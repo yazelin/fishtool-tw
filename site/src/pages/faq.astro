@@ -4,49 +4,190 @@ export const prerender = true;
 import Base from '../layouts/Base.astro';
 import { url } from '../lib/data';
 
-// 等爬蟲 functional_pages.faq 抓回後，把實際 FAQ 內容填到這裡
 const faqs = [
-  { q: '怎麼下單？', a: '從商品頁加入購物車，依結帳流程填寫資料即可。後續會擴充支付/物流整合。' },
-  { q: '滿千免運是怎麼算的？', a: '同筆訂單商品總額（不含運費）滿 NT$1,000 即享免運，限本島地區。' },
-  { q: '可以到實體門市自取嗎？', a: '可以，下單時備註自取，並等待客服聯絡。' },
-  { q: '商品有保固嗎？', a: '原廠商品依品牌保固政策；副廠或特價品依商品頁說明。' },
-  { q: '如何查詢訂單？', a: '請到「訂單查詢」頁面輸入訂單編號與聯絡資料。' },
+  {
+    q: '滿千免運是怎麼算的？',
+    a: '同筆訂單商品總額滿 NT$1,000 即享免運。未滿千：超商取貨 +60 元、宅配 +100 元。\n特價品與餌料除外，需另加運費及手續費。',
+  },
+  {
+    q: '貨到付款要加手續費嗎？',
+    a: '會。貨到付款手續費約 30–90 元，依物流業者收費標準。',
+  },
+  {
+    q: '超商取貨有限重嗎？',
+    a: '【餌料】超商取貨限重 5 公斤！超重一律取消訂單。其他商品則依超商一般取貨規則。',
+  },
+  {
+    q: '出貨時間？',
+    a: '出貨日為週一至週五，假日訂單統一週一出貨。如對訂單有問題，請洽 FB 中壢紅海釣具粉絲團或加 LINE: fishtool2012 將盡速為您處理。',
+  },
+  {
+    q: '可以到中壢實體門市自取嗎？',
+    a: '可以，下單時備註自取，並等待客服聯絡。\n地址：中壢市民族路二段 110 號\n門市營業時間：週一至週六 10:00–22:00、週日 10:00–18:00',
+  },
+  {
+    q: '商品有保固嗎？',
+    a: '原廠商品依品牌保固政策；副廠或特價品依商品頁說明。',
+  },
+  {
+    q: '如何查詢訂單？',
+    a: '請到「訂單查詢」頁面輸入訂單編號與聯絡資料；或直接聯絡客服（LINE / FB / Email）。',
+  },
 ];
 ---
 
-<Base title="常見問題 FAQ">
+<Base title="購物需知">
   <div class="container narrow">
     <header class="head">
-      <h1>常見問題</h1>
-      <p>沒看到答案？歡迎到 <a href={url('inquiry')}>客服詢問</a> 留言。</p>
+      <h1>購物需知</h1>
+      <p>shopping information · 直接看店家整理好的圖，或往下捲讀文字常見問答。</p>
     </header>
 
-    <ul class="faq">
-      {faqs.map((item) => (
-        <li>
-          <details>
-            <summary>
-              <span class="q">{item.q}</span>
-              <span class="indicator" aria-hidden="true">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M6 9l6 6 6-6"/>
-                </svg>
-              </span>
-            </summary>
-            <div class="a"><p>{item.a}</p></div>
-          </details>
-        </li>
-      ))}
-    </ul>
+    <section class="info-images">
+      <figure>
+        <img src={url('banners/shopping-info.jpg')} alt="購物須知：滿千免運、運費、手續費、營業時間、聯絡方式總覽" loading="lazy" />
+        <figcaption>購物須知總覽</figcaption>
+      </figure>
+      <figure>
+        <img src={url('banners/payment.jpg')} alt="付款方式：貨到付款、銀行轉帳、信用卡；支援超商 7-11、全家、萊爾富、OK、Hi-Life、新竹物流、郵局" loading="lazy" />
+        <figcaption>付款方式</figcaption>
+      </figure>
+      <figure>
+        <img src={url('banners/shipping.jpg')} alt="配送方式：本島宅配、超商店到店、外島偏遠採郵局" loading="lazy" />
+        <figcaption>配送方式</figcaption>
+      </figure>
+    </section>
+
+    <section class="quick-facts">
+      <h2>關鍵規則</h2>
+      <ul>
+        <li><strong>滿千免運</strong>：商品滿 NT$1,000 免運；未滿超商 +60 元、宅配 +100 元</li>
+        <li><strong>特價 / 餌料</strong>：需另加運費及手續費</li>
+        <li><strong>貨到付款手續費</strong>：30–90 元（依物流業者）</li>
+        <li><strong>付款</strong>：貨到付款（新竹/郵局/黑貓） · 銀行轉帳 · 信用卡</li>
+        <li><strong>配送</strong>：本島宅配、超商店到店（7-11 / 全家 / 萊爾富 / OK）、外島偏遠郵局</li>
+        <li><strong>餌料超商取貨限重 5 公斤</strong>，超重一律取消訂單</li>
+        <li><strong>出貨日</strong>：週一至週五，假日訂單統一週一出貨</li>
+      </ul>
+    </section>
+
+    <section class="faq-section">
+      <h2>常見問題</h2>
+      <ul class="faq">
+        {faqs.map((item) => (
+          <li>
+            <details>
+              <summary>
+                <span class="q">{item.q}</span>
+                <span class="indicator" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 9l6 6 6-6"/>
+                  </svg>
+                </span>
+              </summary>
+              <div class="a"><p>{item.a}</p></div>
+            </details>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="contact-quick">
+      <h2>還有問題？直接聯絡我們</h2>
+      <div class="contact-grid">
+        <a class="contact-card" href="https://line.me/ti/p/~fishtool2012" target="_blank" rel="noopener">
+          <span class="contact-label line">LINE</span>
+          <span class="contact-value">fishtool2012</span>
+        </a>
+        <a class="contact-card" href="https://www.facebook.com/groups/809912915726639/" target="_blank" rel="noopener">
+          <span class="contact-label">Facebook 社團</span>
+          <span class="contact-value">中壢紅海釣具粉絲團</span>
+        </a>
+        <a class="contact-card" href="tel:034951686">
+          <span class="contact-label">電話</span>
+          <span class="contact-value">03-4951686</span>
+        </a>
+        <a class="contact-card" href="mailto:service@fishtool.tw">
+          <span class="contact-label">Email</span>
+          <span class="contact-value">service@fishtool.tw</span>
+        </a>
+      </div>
+    </section>
   </div>
 </Base>
 
 <style>
-  .narrow { max-width: 720px; }
+  .narrow { max-width: 880px; }
   .head { margin-block: var(--space-5) var(--space-6); }
   .head p { color: var(--fg-secondary); margin-top: var(--space-2); font-size: var(--text-sm); }
-  .head a { color: var(--brand-tide); text-decoration: underline; text-underline-offset: 3px; }
 
+  .info-images {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+    margin-block: var(--space-6);
+  }
+  @media (min-width: 768px) {
+    .info-images { grid-template-columns: repeat(3, 1fr); }
+  }
+  .info-images figure {
+    margin: 0;
+    background: var(--bg-soft);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+  .info-images img {
+    width: 100%; height: auto; display: block;
+    background: #fff;
+  }
+  .info-images figcaption {
+    padding: var(--space-3);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-align: center;
+    border-top: 1px solid var(--border-soft);
+  }
+
+  .quick-facts {
+    background: var(--bg-soft);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    padding: var(--space-5) var(--space-6);
+    margin-block: var(--space-7);
+  }
+  .quick-facts h2 {
+    font-size: var(--text-xl);
+    margin-bottom: var(--space-4);
+  }
+  .quick-facts ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    line-height: 1.7;
+  }
+  .quick-facts li {
+    padding-left: var(--space-4);
+    position: relative;
+  }
+  .quick-facts li::before {
+    content: '◆';
+    position: absolute;
+    left: 0;
+    color: var(--brand-tide);
+    font-size: 10px;
+    top: 6px;
+  }
+  .quick-facts strong { color: var(--fg-primary); }
+
+  .faq-section h2 {
+    font-size: var(--text-xl);
+    margin-bottom: var(--space-4);
+    margin-top: var(--space-7);
+  }
   .faq {
     list-style: none;
     padding: 0;
@@ -87,7 +228,45 @@ const faqs = [
     padding: 0 var(--space-5) var(--space-5);
     color: var(--fg-secondary);
     line-height: 1.85;
-    border-top: 1px solid var(--border-subtle);
+    border-top: 1px solid var(--border-soft);
     padding-top: var(--space-4);
+  }
+  details .a p { white-space: pre-line; }
+
+  .contact-quick { margin-top: var(--space-8); }
+  .contact-quick h2 { font-size: var(--text-xl); margin-bottom: var(--space-4); }
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+  @media (min-width: 600px) { .contact-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 900px) { .contact-grid { grid-template-columns: repeat(4, 1fr); } }
+  .contact-card {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-4) var(--space-5);
+    background: var(--bg-soft);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    color: var(--fg-primary);
+    transition: border-color var(--duration-fast) var(--ease-out),
+                transform var(--duration-fast) var(--ease-out);
+  }
+  .contact-card:hover {
+    border-color: var(--brand-tide);
+    transform: translateY(-2px);
+    color: var(--fg-primary);
+  }
+  .contact-label {
+    font-size: var(--text-xs);
+    color: var(--fg-muted);
+    letter-spacing: 0.08em;
+    margin-bottom: var(--space-2);
+  }
+  .contact-label.line { color: #06C755; font-weight: 700; letter-spacing: 0.1em; }
+  .contact-value {
+    font-size: var(--text-base);
+    font-weight: 600;
   }
 </style>
