@@ -1,10 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-label="紅海釣具">
   <title>紅海釣具 FishTool.tw</title>
-  <rect width="64" height="64" rx="14" fill="#0B1B2B"/>
-  <!-- 魚鉤 -->
-  <path d="M32 14 L32 36 a10 10 0 0 1 -20 0 L12 34" fill="none" stroke="#E15D2F" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- 鉤眼 -->
-  <circle cx="32" cy="13" r="2.6" fill="#E15D2F"/>
-  <!-- 海浪 -->
-  <path d="M10 50 Q19 46 28 50 T46 50 T56 50" fill="none" stroke="#0E7C86" stroke-width="3" stroke-linecap="round" stroke-opacity="0.95"/>
+  <!-- 暖炭底（圓角 squircle） -->
+  <rect width="64" height="64" rx="14" fill="#1A1816"/>
+  <!-- 內側細邊 brass -->
+  <rect x="2.5" y="2.5" width="59" height="59" rx="12" fill="none" stroke="#A88862" stroke-width="0.6" stroke-opacity="0.4"/>
+  <!-- 魚鉤（brass）-->
+  <path d="M32 14 L32 36 a10 10 0 0 1 -20 0 L12 34" fill="none" stroke="#C9B292" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 鉤眼（亮 brass dot）-->
+  <circle cx="32" cy="13.2" r="2.6" fill="#D4A86A"/>
+  <!-- 海浪線（深 brass）-->
+  <path d="M10 50 Q19 46 28 50 T46 50 T56 50" fill="none" stroke="#A88862" stroke-width="2.4" stroke-linecap="round" stroke-opacity="0.85"/>
 </svg>

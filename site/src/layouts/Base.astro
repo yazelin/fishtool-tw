@@ -12,12 +12,15 @@ interface Props {
 
 const {
   title,
-  description = '紅海釣具店 — 磯釣 / 灘釣 / 船釣 / 釣蝦 / 路亞 / 全品項精選',
+  description = '紅海釣具 FishTool.tw — 磯釣 / 灘釣 / 船釣 / 釣蝦 / 路亞，中壢實體門市與線上同步出貨。SHIMANO、DAIWA、OWNER、gamakatsu 等 30+ 品牌長期供貨。',
   ogImage,
 } = Astro.props;
 
-const siteName = '紅海釣具店';
+const siteName = '紅海釣具';
 const fullTitle = title === siteName ? title : `${title} ｜ ${siteName}`;
+const siteUrl = Astro.site?.toString().replace(/\/+$/, '') ?? '';
+const defaultOg = `${siteUrl}${url('og-image.png')}`;
+const ogImageFull = ogImage ?? defaultOg;
 ---
 
 <!doctype html>
@@ -26,11 +29,28 @@ const fullTitle = title === siteName ? title : `${title} ｜ ${siteName}`;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+
+    {/* Open Graph */}
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
-    {ogImage && <meta property="og:image" content={ogImage} />}
-    <link rel="icon" href={url('favicon.svg')} type="image/svg+xml" />
+    <meta property="og:site_name" content="紅海釣具 FishTool.tw" />
+    <meta property="og:locale" content="zh_TW" />
+    <meta property="og:image" content={ogImageFull} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="紅海釣具 FishTool.tw — 探索無限可能 釣出你的精彩" />
+
+    {/* Twitter / X */}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageFull} />
+
+    {/* Favicons — 銅印 PNG 為主、SVG 為 fallback */}
+    <link rel="icon" type="image/png" href={url('favicon.png')} />
+    <link rel="icon" type="image/svg+xml" href={url('favicon.svg')} />
+    <link rel="apple-touch-icon" href={url('favicon.png')} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,500;1,600&family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600&family=Noto+Serif+TC:wght@400;500;600;700&display=swap" />
