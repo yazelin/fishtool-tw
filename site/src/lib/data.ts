@@ -32,14 +32,16 @@ export function formatPrice(n: number | null | undefined): string {
   return `$${n.toLocaleString('zh-Hant')}`;
 }
 
-// 把資料裡 /images188/X 路徑改為走我們自己的 HTTPS proxy（避免 mixed content）。
-// e.g. "/images188/2000162-1.jpg" → "/api/img/2000162-1.jpg"
+// 把資料裡 /images188/X 路徑改為走 Cloudflare Worker 圖片代理(HTTPS + CF 邊緣快取)。
+// e.g. "/images188/2000162-1.jpg" → "https://fishtool-img.yazelinj303.workers.dev/2000162-1.jpg"
+// 原本走 Vercel /api/img,會吃 Fluid CPU + Fast Origin Transfer;搬到 CF 止血。
+// 長期方案:21GB 圖遷 R2。
 const IMG_PATH_RE = /^\/images188\//;
+const IMG_CDN = 'https://fishtool-img.yazelinj303.workers.dev';
 export function proxyImg(src: string | null | undefined): string | null {
   if (!src) return null;
   if (IMG_PATH_RE.test(src)) {
-    const base = (import.meta.env.BASE_URL ?? '').replace(/\/+$/, '');
-    return `${base}/api/img/${src.replace(IMG_PATH_RE, '')}`;
+    return `${IMG_CDN}/${src.replace(IMG_PATH_RE, '')}`;
   }
   return src;
 }
