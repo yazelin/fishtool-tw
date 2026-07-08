@@ -1,0 +1,31 @@
+# 商品頁走 SSR（20K+ 件），AI 訓練/資料收集爬蟲重複狂爬會吃光 Vercel Fluid CPU 額度。
+# 擋掉這些爬蟲對 /products/ 的存取；搜尋引擎（Googlebot/Bingbot）正常放行，不影響 SEO。
+User-agent: ClaudeBot
+Disallow: /products/
+
+User-agent: GPTBot
+Disallow: /products/
+
+User-agent: ChatGPT-User
+Disallow: /products/
+
+User-agent: CCBot
+Disallow: /products/
+
+User-agent: Bytespider
+Disallow: /products/
+
+User-agent: PerplexityBot
+Disallow: /products/
+
+User-agent: Google-Extended
+Disallow: /products/
+
+User-agent: Amazonbot
+Disallow: /products/
+
+User-agent: Applebot-Extended
+Disallow: /products/
+
+User-agent: *
+Allow: /

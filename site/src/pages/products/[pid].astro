@@ -11,6 +11,9 @@ const all = await loadProductMap();
 const product = all.get(pid);
 if (!product) return new Response('Product not found', { status: 404 });
 
+// 資料只在手動重 build 時更新，CDN 快取 1 小時止血 Fluid CPU（見 docs：ClaudeBot 等爬蟲每秒狂打）
+Astro.response.headers.set('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
+
 const brand = extractBrand(product.name);
 const hasSale =
   product.price !== null &&
