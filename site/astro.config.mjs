@@ -13,6 +13,7 @@ export default defineConfig({
   output: 'server',
   adapter: vercel({
     webAnalytics: { enabled: false },
+    edgeMiddleware: true,
   }),
   build: {
     assets: '_assets',
